@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Math | Dabo</title>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#EEF2F7;--card:#fff;--ink:#12263F;--mut:#5B6B80;--acc:#FFB400;--on:#12263F;--ok:#0E8F80;--bad:#D93A40;--line:#D5DDE8;--soft:#F3F6FA;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0D1726;--card:#16243A;--ink:#EAF0F8;--mut:#9DB0C8;--line:#2A3B55;--soft:#1C2D47;--ok:#2FD0BC;--bad:#FF6B70}}
+:root[data-theme="dark"]{--bg:#0D1726;--card:#16243A;--ink:#EAF0F8;--mut:#9DB0C8;--line:#2A3B55;--soft:#1C2D47;--ok:#2FD0BC;--bad:#FF6B70}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*:before,*:after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 Rubik,system-ui,-apple-system,"Segoe UI",sans-serif}
+.wrap{max-width:980px;margin:0 auto;padding:16px}
+h1{font-size:28px;font-weight:800;margin:0;letter-spacing:-.5px}
+h1 i{display:inline-block;width:5px;height:.9em;background:var(--acc);margin:0 .3em;vertical-align:-.1em;border-radius:2px}
+h2{font-size:20px;margin:0 0 8px}
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.stats{display:flex;gap:8px;font-weight:700;font-size:14px;flex-wrap:wrap}
+.stats span{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:4px 12px}
+.xp{height:8px;background:var(--line);border-radius:4px;margin:12px 0;overflow:hidden}
+.xp div{height:100%;background:var(--acc);transition:width .4s}
+nav{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:12px}
+nav button{flex:1;white-space:nowrap}
+button,select,input{font:inherit;color:var(--ink)}
+button{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:9px 14px;cursor:pointer;font-weight:500}
+button:hover{border-color:var(--acc)}
+button:focus-visible,select:focus-visible,input:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+button.on,button.pri{background:var(--acc);border-color:var(--acc);color:#12263F;font-weight:700}
+button:disabled{opacity:.45;cursor:not-allowed}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:12px}
+.big{font-size:clamp(24px,6vw,36px);font-weight:700;text-align:center;padding:22px 8px;background:var(--soft);border-radius:12px;margin:10px 0;overflow-wrap:anywhere}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+input,select{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:9px 12px}
+input{flex:1;min-width:120px;font-size:18px}
+.ok{color:var(--ok);font-weight:500}.bad{color:var(--bad);font-weight:500}.mut{color:var(--mut);font-size:14px}
+.bar{display:flex;align-items:center;gap:10px;margin:6px 0;font-size:14px}.bar b{width:150px;font-weight:500}
+.bar div{flex:1;height:10px;background:var(--line);border-radius:5px;overflow:hidden}.bar div i{display:block;height:100%;background:var(--ok)}
+.sd{display:grid;grid-template-columns:repeat(4,1fr);width:min(100%,280px);margin:12px auto;border:3px solid var(--ink);border-radius:6px;overflow:hidden}
+.sd button{aspect-ratio:1;border:1px solid var(--line);border-radius:0;font-size:24px;padding:0;background:var(--card)}
+.sd button:nth-child(4n+2),.sd button:nth-child(4n+3){border-right:1px solid var(--line)}
+.sd button:nth-child(4n+2){border-right:3px solid var(--ink)}
+.sd button:nth-child(n+5):nth-child(-n+8){border-bottom:3px solid var(--ink)}
+.sd .giv{background:var(--soft);font-weight:800}.sd .sel{background:var(--acc);color:#12263F}.sd .err{color:var(--bad);background:rgba(217,58,64,.15)}
+.pad{justify-content:center}
+.stones{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;min-height:44px;padding:10px}
+.stones span{width:26px;height:26px;border-radius:50%;background:var(--acc);border:2px solid var(--ink)}
+.fc{min-height:120px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;gap:6px}
+.t{display:flex;gap:8px;align-items:center;padding:6px 0;border-bottom:1px solid var(--line);font-size:14px}
+.top{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 14px;margin-bottom:8px}
+.me{display:inline-flex;align-items:center;gap:6px}
+.me img,.avbig{width:28px;height:28px;border-radius:50%;object-fit:cover;border:2px solid var(--acc)}
+.avbig{width:84px;height:84px;display:block;background:var(--soft)}
+#auth{position:fixed;inset:0;z-index:100;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:16px}
+#auth .card{width:min(100%,380px);display:flex;flex-direction:column;gap:10px}
+#auth[hidden],section[hidden]{display:none}
+#letter{position:fixed;inset:0;z-index:150;background:var(--bg);overflow:auto;padding:16px}
+#letter .paper{max-width:640px;margin:0 auto;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:24px 22px;line-height:1.75}
+#letter h2{text-align:center;margin-bottom:14px}
+#letter p{margin:0 0 12px}
+#letter .sig{margin-top:18px;font-weight:700}
+.pw{position:relative;display:flex}
+.pw input{width:100%;padding-right:50px}
+.pw button{position:absolute;right:4px;top:50%;transform:translateY(-50%);border:0;background:none;padding:6px 8px;display:flex;align-items:center}
+.sw{width:56px;height:40px;border-radius:10px;border:3px solid var(--line);padding:0}
+.sw.on{border-color:var(--ink)}
+h3{font-size:16px;margin:14px 0 8px}
+#toast{position:fixed;left:50%;top:20%;transform:translateX(-50%);z-index:200;background:var(--card);border:3px solid var(--acc);border-radius:18px;padding:16px 24px;font-size:22px;font-weight:800;text-align:center;box-shadow:0 8px 30px rgba(0,0,0,.25);animation:pop .4s}
+@keyframes pop{from{transform:translateX(-50%) scale(.5);opacity:0}}
+.fall{position:fixed;top:-40px;z-index:199;font-size:28px;pointer-events:none;animation:fall 2.2s linear forwards}
+@keyframes fall{to{transform:translateY(110vh) rotate(360deg)}}
+/* Басты бет: бақылау тақтасы */
+.dash{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px;margin-bottom:12px}
+.dash .card{margin:0}
+.dash .bar b{width:96px}.dash .bar span{width:64px;text-align:right;font-size:12px;color:var(--mut)}
+.rings{display:flex;justify-content:space-around;gap:8px}
+.ring{text-align:center;font-size:13px;color:var(--mut)}
+.ring svg{width:84px;height:84px;display:block;margin:0 auto 4px}
+.ring text{font:700 16px Rubik,sans-serif;fill:var(--ink)}
+.dn{width:150px;height:150px;border-radius:50%;margin:10px auto;display:grid;place-items:center}
+.dn div{width:102px;height:102px;border-radius:50%;background:var(--card);display:grid;place-items:center;font-weight:700}
+.lg{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;font-size:13px}
+.lg i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:4px}
+.tabs{display:flex;justify-content:center;margin-top:12px}
+.tabs button{border-radius:0;padding:5px 10px;font-size:13px}
+.tabs button:first-child{border-radius:8px 0 0 8px}.tabs button:last-child{border-radius:0 8px 8px 0}
+.rg{display:grid;gap:3px;margin:6px 0 14px}
+.rc{aspect-ratio:1;background:var(--line);border-radius:2px}.rc.f{background:var(--acc)}
+.wl{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;text-align:center;font-size:11px;color:var(--mut)}
+.bds{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px}
+.bd{text-align:center;border:1px solid var(--line);border-radius:12px;padding:10px 6px;background:var(--soft);font-size:13px}
+.bd .ic{font-size:34px;line-height:1.2}
+.bd.lock{opacity:.4;filter:grayscale(1)}
+.bd small{display:block;color:var(--mut);font-size:11px}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0}
+.opts[hidden]{display:none}
+.opts button{font-size:22px;font-weight:700;padding:16px 8px}
+.opts button:disabled{opacity:1;cursor:default}
+.opts .rt{border:2px solid var(--ok);background:rgba(14,143,128,.15)}
+.opts .xx{border:2px solid var(--bad);background:rgba(217,58,64,.15)}
+.tbar{flex:1;height:10px;background:var(--line);border-radius:5px;overflow:hidden}
+.tbar i{display:block;height:100%;background:var(--ok);width:100%}
+.tbar i.low{background:var(--bad)}
+.qst{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;background:var(--soft);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:12px}
+</style>
+</head>
+<body>
+<div id="auth" hidden><div class="card">
+<h1>Math<i></i>Dabo</h1>
+<h2 id="aT">Кіру</h2>
+<input id="aL" placeholder="Логин" autocomplete="username" maxlength="24" onkeydown="if(event.key=='Enter'){event.preventDefault();$('#aP').focus()}">
+<div class="pw"><input id="aP" type="password" placeholder="Пароль (кемінде 6 таңба)" autocomplete="current-password" onkeydown="if(event.key=='Enter')authGo()"><button type="button" id="eye" onclick="togglePw()" aria-label="Парольді көрсету" aria-pressed="false"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg></button></div>
+<p class="bad" id="aE" aria-live="polite"></p>
+<button class="pri" id="aGo" onclick="authGo()">Кіру</button>
+<button id="aSw" onclick="authMode(mode=='in'?'up':'in')"></button>
+<button id="aF" onclick="forgot()" hidden>Парольді ұмыттым</button>
+<p class="mut">Нәтижең осы құрылғыда аккаунтыңа сақталады: кірген сайын деңгейің сол қалпында болады.</p>
+</div></div>
+<div class="wrap">
+<div class="top"><h1>Math<i></i>Dabo</h1><div class="stats"><span class="me"><img id="avi" alt="" hidden><b id="nk"></b></span><span id="sLv"></span><span id="sXp"></span><span id="sSt"></span></div></div>
+<div class="xp"><div id="xpb"></div></div>
+<nav id="nav"></nav>
+
+<!-- 1. БАСТЫ БЕТ -->
+<section id="home">
+<div class="dash" id="dash"></div>
+<div class="card"><h2>Менің меңгеруім</h2><div id="mast"></div></div>
+<div class="card"><h2>Значоктар</h2><p class="mut" id="dsm"></p><div class="bds" id="bds"></div></div>
+</section>
+
+<!-- 2. ФОРМУЛАЛАР -->
+<section id="form" class="card" hidden>
+<h2>Формулалар картасы</h2>
+<div class="fc"><div class="mut" id="fT"></div><div class="big" id="fN" style="width:100%"></div></div>
+<div class="row pad" id="fB"></div>
+</section>
+
+<!-- 3. ЕСЕПТЕР -->
+<section id="prob" hidden>
+<div class="card">
+<h2>Есептер</h2>
+<div class="row" style="margin-top:8px"><select id="topic" onchange="newQ()"></select><span class="mut" id="qm"></span></div>
+<div class="big" id="q"></div>
+<div id="typed" class="row"><input id="ans" inputmode="text" placeholder="Жауабың" autocomplete="off" onkeydown="if(event.key=='Enter')check()"><button class="pri" id="chk" onclick="check()">Тексеру</button></div>
+<p id="fb" aria-live="polite"></p>
+</div>
+<!-- ЖЫЛДАМ ЖАУАП -->
+<div class="card">
+<h2>Жылдам жауап</h2>
+<div id="qks"><p class="mut">4 нұсқаның біреуі дұрыс, әр есепке 40 секунд беріледі. Тек арифметика және теңдеулер.</p><button class="pri" onclick="openQK()">Бастау</button></div>
+<div id="qkv" hidden>
+<button onclick="closeQK()">Аяқтау</button>
+<div class="row"><select id="qkT" onchange="newQK()"></select><span class="mut" id="qkM"></span></div>
+<div class="row" style="margin-top:8px"><b id="qkS">40</b><span class="mut">сек</span><span class="tbar"><i id="qkB"></i></span></div>
+<div class="big" id="qkQ"></div>
+<div class="opts" id="qkO"></div>
+<p id="qkF" aria-live="polite"></p>
+<div class="row" id="qkN" hidden><button class="pri" onclick="newQK()">Келесі есеп</button></div>
+</div>
+</div>
+</section>
+
+<!-- 4. ЛОГИКА -->
+<section id="logic" hidden>
+<div class="card">
+<h2>Мини-судоку 4×4</h2>
+<p class="mut">Әр жолда, бағанда және 2×2 аймақта 1–4 сандары бір реттен болады.</p>
+<div class="row"><select id="sdl"><option value="0">Оңай</option><option value="1" selected>Орташа</option><option value="2">Қиын</option></select><button onclick="newSudoku()">Жаңа ойын</button><button onclick="hint()">Көмек (AI)</button></div>
+<div class="sd" id="sdg"></div>
+<div class="row pad" id="sdp"></div>
+<p id="sdm" aria-live="polite" class="mut"></p>
+</div>
+<div class="card">
+<h2>Тас алу ойыны: сен және AI</h2>
+<p class="mut">Кезекпен 1, 2 немесе 3 тас аласыңдар. Соңғы тасты алған адам ұтады.</p>
+<div class="row"><select id="nl"><option value="2">AI: бастаушы</option><option value="16" selected>AI: мықты</option></select><button onclick="newNim()">Жаңа ойын</button><button onclick="nimHint()">Стратегия</button></div>
+<div class="stones" id="stn"></div>
+<div class="row pad" id="nbt"></div>
+<p id="nm" aria-live="polite"></p>
+</div>
+<div class="card">
+<h2>Сандар тізбегі</h2>
+<p class="mut">Заңдылықты тауып, келесі санды жаз.</p>
+<div class="big" id="sqq"></div>
+<div class="row"><input id="sqa" inputmode="numeric" placeholder="Келесі сан" autocomplete="off" onkeydown="if(event.key=='Enter')sqCheck()"><button class="pri" id="sqb" onclick="sqCheck()">Тексеру</button><button onclick="sqHint()">Көмек</button></div>
+<p id="sqm" aria-live="polite"></p>
+</div>
+</section>
+
+<div id="letter" hidden><div class="paper">
+<h2>Алғыс хат</h2>
+<p><b>Құрметті сайт пайдаланушысы!</b></p>
+<p>Алдымен, сізге біздің авторлық веб-платформамыздың тұрақты аудиториясы қатарынан табылып, бастамымызға қолдау көрсеткеніңіз үшін шынайы ризашылығымды білдіргім келеді.</p>
+<p>Бұл жобаны әзірлеу барысында біз әрбір келушінің қажеттілігін толық өтейтін, заманауи талаптарға сай сапалы өнім жасауды басты мақсат етіп қойған болатынбыз. Бүгінгі таңда сіздің біздің ресурсты белсенді пайдаланып, өз тарапыңыздан кері байланыс орнатуыңыз – атқарылып жатқан ауқымды еңбектің нәтижелі екендігінің айқын дәлелі.</p>
+<p>Сіздің сеніміңіз бізге тың серпін беріп қана қомай, қызмет сапасын үздіксіз жетілдіруге, сондай-ақ платформамыздың функционалдық мүмкіндіктерін кеңейтуге жол ачады. Алдағы уақытта да сіздің үмітіңізді ақтап, қолайлы жағдай жасау үшін барлық күш-жігерімізді жұмсайтын боламыз.</p>
+<p>Жобамыздың дамуына үлес қосып, бірлескен жұмысқа атсалысып жатқаныңыз үшін зор алғысымды білдіремін!</p>
+<p class="sig">Ізгі тілекпен және құрметпен,<br>Утеген Дастан</p>
+<button class="pri" onclick="$('#letter').hidden=true">Жабу</button>
+</div></div>
+<!-- БАПТАУ -->
+<section id="set" class="card" hidden>
+<h2>Баптау</h2>
+<h3>Профиль</h3>
+<div class="row"><img id="avb" class="avbig" alt="Профиль фотосы"><div><label class="mut" for="avf">Фото жүктеу</label><br><input type="file" id="avf" accept="image/*" onchange="upAv(this)"></div></div>
+<h3>Никнейм</h3>
+<div class="row"><input id="nkI" maxlength="20" placeholder="Никнеймің"><button class="pri" onclick="saveNick()">Сақтау</button></div>
+<h3>Фон</h3>
+<div class="row" id="bgs"></div>
+<h3>Промокод</h3>
+<p class="mut" id="pi"></p>
+<div class="row"><input id="pc" placeholder="Промокодты жаз" autocomplete="off" onkeydown="if(event.key=='Enter')usePromo()"><button class="pri" onclick="usePromo()">Қолдану</button></div>
+<p id="pm" aria-live="polite"></p>
+<button id="pr" onclick="openLetter()" hidden>Алғыс хатты қайта ашу</button>
+<h3>Аккаунт</h3>
+<button onclick="logout()">Шығу</button>
+</section>
+
+<!-- 5. AI ТЕКСЕРУ -->
+<section id="test" class="card" hidden>
+<h2>AI алгоритмдерін тексеру</h2>
+<p class="mut">Жобаға қосылған үш AI тақырыбы: 3-апта (CSP: судоку шешуші), 4-апта (Minimax және Alpha-Beta: тас ойыны), 6-апта (Байес: меңгеруді бағалау).</p>
+<button class="pri" onclick="runTests()">Тесттерді іске қосу</button>
+<div id="tr"></div>
+</section>
+</div>
+
+<script>
+/* ===== Негізгі күй және сақтау (localStorage қолжетімсіз болса да жұмыс істейді) ===== */
+const $=s=>document.querySelector(s);
+const LS={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+let U={};try{U=JSON.parse(LS.get("dabo_users")||"{}")}catch(e){}
+let CUR=LS.get("dabo_cur")||"";
+const DEF=()=>({xp:0,streak:0,m:{},nick:"",av:"",bg:0,ok:0,tot:0,sp:{},tm:{},at:{},days:[],bd:{},fk:{},sud:0,win:0,sv:0});
+let S=DEF();
+function save(){if(CUR&&U[CUR]){U[CUR].d=S;LS.set("dabo_users",JSON.stringify(U))}}
+const R=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+const pick=a=>a[R(0,a.length-1)];
+const shuf=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=R(0,i);[a[i],a[j]]=[a[j],a[i]]}return a};
+const TOPICS={arif:"Арифметика",teng:"Теңдеулер",payiz:"Пайыз",geo:"Геометрия",dar:"Дәреже және түбір"};
+const ulv=()=>Math.min(18,1+Math.floor(S.sv/40));
+function addXP(n){S.xp+=n;save();ui()}
+/* Дұрыс шешілген есеп: 18 деңгей x 40 есеп = 720 */
+function solved(){
+  if(S.sv>=720)return null;
+  const b=ulv();S.sv++;const a=ulv();
+  if(S.sv>=720)return"🏁 720 есептің бәрі шықты! Сен чемпионсың!";
+  return a>b?(a==8?"🎁 8-деңгей! Баптауда промокод берілді!":"🎉 Жаңа деңгей! "+a+"-деңгейге көтерілдің!"):null;
+}
+function ui(){
+  $("#sLv").textContent="Деңгей "+ulv()+"/18";$("#sXp").textContent=S.xp+" XP";$("#sSt").textContent="Серия: "+S.streak;
+  $("#xpb").style.width=(S.sv>=720?100:(S.sv%40)*2.5)+"%";$("#xpb").parentNode.title=(S.sv>=720?40:S.sv%40)+"/40 есеп";
+  $("#nk").textContent=(S.av?"":"🙂 ")+(S.nick||"");$("#avi").hidden=!S.av;if(S.av)$("#avi").src=S.av;
+  $("#mast").innerHTML=Object.keys(TOPICS).map(t=>`<div class="bar"><b>${TOPICS[t]}</b><div><i style="width:${Math.round(P(t)*100)}%"></i></div>${Math.round(P(t)*100)}%</div>`).join("");
+  if(!$("#home").hidden)drawDash();
+  checkBadges();
+}
+
+/* ===== Күндер, уақыт, жазба көмекшілері ===== */
+const DN=["Дс","Сс","Ср","Бс","Жм","Сб","Жк"];
+const dk=d=>d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+const weekKeys=()=>{const n=new Date(),w=(n.getDay()+6)%7;return[...Array(7)].map((_,i)=>dk(new Date(n.getFullYear(),n.getMonth(),n.getDate()-w+i)))};
+const fmt=s=>[s/3600|0,(s/60|0)%60,s%60].map(v=>String(v).padStart(2,"0")).join(":");
+function touchDay(){const k=dk(new Date());if(!S.days.includes(k)){S.days.push(k);S.days=S.days.slice(-90);save()}}
+function dayStreak(){const s=new Set(S.days);let n=0,d=new Date();while(s.has(dk(d))){n++;d.setDate(d.getDate()-1)}return n}
+/* әр жауап: дәлдік, жылдамдық, әрекет саны */
+function rec(t,ok,sec){
+  S.tot++;if(ok)S.ok++;const k=dk(new Date());S.at[k]=(S.at[k]||0)+1;
+  if(t){const z=S.sp[t]||(S.sp[t]={n:0,t:0});z.n++;z.t+=Math.min(Math.max(sec,1),120)}
+  save();
+}
+/* жаттығу уақыты: тек Формулалар, Есептер, Логика бөлімдерінде есептеледі */
+let tab="home",tk=0;
+setInterval(()=>{
+  const m={prob:"p",quick:"p",form:"f",logic:"l"}[tab];
+  if(!CUR||!U[CUR]||document.hidden)return;
+  touchDay();if(!m)return;
+  const k=dk(new Date()),d=S.tm[k]||(S.tm[k]={p:0,f:0,l:0});d[m]++;
+  if(++tk%10==0)save();
+},1000);
+addEventListener("pagehide",save);
+
+/* ===== Басты бет: бақылау тақтасы ===== */
+const TSEC=[["p","Есептер","#FF5C8A"],["f","Формулалар","#FFB400"],["l","Логика","#3BC0D8"]];
+let dtab=0;
+const ring=(p,l,c)=>`<div class="ring"><svg viewBox="0 0 84 84" role="img" aria-label="${l}: ${p}%"><circle cx="42" cy="42" r="34" fill="none" stroke="var(--line)" stroke-width="9"/><circle cx="42" cy="42" r="34" fill="none" stroke="${c}" stroke-width="9" stroke-linecap="round" stroke-dasharray="${(2*Math.PI*34*p/100).toFixed(1)} 999" transform="rotate(-90 42 42)"/><text x="42" y="48" text-anchor="middle">${p}%</text></svg>${l}</div>`;
+function tmSum(){
+  const keys=dtab==0?[dk(new Date())]:dtab==1?weekKeys():Object.keys(S.tm),o={p:0,f:0,l:0};
+  keys.forEach(k=>{const d=S.tm[k];if(d)for(const x in o)o[x]+=d[x]||0});return o;
+}
+function drawDash(){
+  const sp=Object.keys(TOPICS).map(t=>{const z=S.sp[t],r=z&&z.t>0?z.n/(z.t/60):0;
+    return`<div class="bar"><b>${TOPICS[t]}</b><div><i style="width:${Math.min(100,r*12)}%"></i></div><span>${r?r.toFixed(1).replace(".",",")+"/мин":"—"}</span></div>`}).join("");
+  const ac=S.tot?Math.round(S.ok/S.tot*100):0,cv=Math.round(Object.keys(S.fk).length/F.length*100);
+  const o=tmSum(),tot=o.p+o.f+o.l;let acc=0;
+  const grad=tot?TSEC.map(([k,,c])=>{const s=acc;acc+=o[k]/tot*100;return`${c} ${s}% ${acc}%`}).join(","):"var(--line) 0% 100%";
+  const lg=TSEC.map(([k,n,c])=>`<span><i style="background:${c}"></i>${n} ${fmt(o[k])}</span>`).join("");
+  const tn=S.at[dk(new Date())]||0,wk=weekKeys().map(k=>S.at[k]||0),wt=wk.reduce((a,b)=>a+b,0);
+  const todayG=Array.from({length:30},(_,i)=>`<div class="rc ${i<tn?"f":""}"></div>`).join("");
+  let weekG="";for(let r=0;r<8;r++)for(let c=0;c<7;c++)weekG+=`<div class="rc ${wk[c]>7-r?"f":""}"></div>`;
+  $("#dash").innerHTML=`
+<div class="card"><h2>Жылдамдық</h2><p class="mut" style="margin:0 0 6px">Минутына шешілген есеп</p>${sp}
+<h3>Дәлдік және қамту</h3><div class="rings">${ring(ac,"Дәлдік","#3BC0D8")}${ring(cv,"Қамту","#3BC0D8")}</div>
+<p class="mut" style="margin:8px 0 0">Қамту: білетін формулалар үлесі</p></div>
+<div class="card"><h2>Жаттығу уақыты</h2><div class="dn" style="background:conic-gradient(${grad})" role="img" aria-label="Жаттығу уақыты ${fmt(tot)}"><div>${fmt(tot)}</div></div><div class="lg">${lg}</div>
+<div class="tabs">${["Бүгін","Осы апта","Жалпы"].map((n,i)=>`<button class="${dtab==i?"on":""}" onclick="dtab=${i};drawDash()">${n}</button>`).join("")}</div></div>
+<div class="card"><h2>Жаттығу раундтары</h2>
+<p class="mut" style="margin:0">Бүгін: ${tn} әрекет</p><div class="rg" style="grid-template-columns:repeat(10,1fr)">${todayG}</div>
+<p class="mut" style="margin:0">Осы апта: ${wt} әрекет</p><div class="rg" style="margin-bottom:4px;grid-template-columns:repeat(7,1fr)">${weekG}</div><div class="wl">${DN.map(d=>`<span>${d}</span>`).join("")}</div></div>`;
+  const ds=dayStreak();
+  $("#dsm").textContent=`Күн қатарынан кірдің: ${ds} күн. Апта бойы (7 күн) тоқтаусыз кірсең, арнайы значок аласың.`;
+  $("#bds").innerHTML=BD.map(b=>{const g=S.bd[b[0]];return`<div class="bd ${g?"":"lock"}"><div class="ic">${b[1]}</div><b>${b[2]}</b><small>${b[3]}</small></div>`}).join("");
+}
+
+/* ===== Значоктар ===== */
+const BD=[
+["first","🌱","Алғашқы қадам","1 дұрыс жауап",()=>S.ok>=1],
+["c50","🎯","Мерген","50 дұрыс жауап",()=>S.ok>=50],
+["c200","🧠","Ақыл иесі","200 дұрыс жауап",()=>S.ok>=200],
+["str10","🔥","Алтын серия","10 жауап қатарынан дұрыс",()=>S.streak>=10],
+["d3","📅","3 күн қатарынан","3 күн қатарынан кірдің",()=>dayStreak()>=3],
+["d7","🏅","Апта чемпионы","7 күн тоқтаусыз кірдің",()=>dayStreak()>=7],
+["d30","👑","Ай жұлдызы","30 күн тоқтаусыз кірдің",()=>dayStreak()>=30],
+["fm10","📘","Формула шебері","10 формуланы білесің",()=>Object.keys(S.fk).length>=10],
+["lv5","⭐","5-деңгей","5-деңгейге жеттің",()=>ulv()>=5],
+["lv10","🚀","10-деңгей","10-деңгейге жеттің",()=>ulv()>=10],
+["lv18","🎓","Чемпион","720 есептің бәрін шештің",()=>S.sv>=720],
+["sud","🧩","Судоку шебері","Судоку шештің",()=>S.sud>0],
+["nim","🏆","AI жеңімпазы","AI-ды жеңдің",()=>S.win>0]
+];
+function checkBadges(){
+  if(!CUR||!U[CUR])return;const nw=[];
+  BD.forEach(b=>{if(!S.bd[b[0]]&&b[4]()){S.bd[b[0]]=dk(new Date());nw.push(b[1]+" "+b[2])}});
+  if(nw.length){save();setTimeout(()=>{cheer("Жаңа значок: "+nw.join(", "));if(!$("#home").hidden)drawDash()},500)}
+}
+
+/* ===== 6-апта: Байес әдісімен меңгеруді бағалау (Bayesian Knowledge Tracing) ===== */
+const P=t=>S.m[t]??0.3;
+function bkt(t,ok,store=true){
+  const pS=.1,pG=.2,pT=.15,p=P(t);
+  const post=ok?p*(1-pS)/(p*(1-pS)+(1-p)*pG):p*pS/(p*pS+(1-p)*(1-pS));
+  const np=post+(1-post)*pT;
+  if(store){S.m[t]=np;save()}
+  return np;
+}
+/* Қиындық ойыншы деңгейіне (1–18) тең */
+const level=t=>ulv();
+
+/* ===== Бөлімдер арасында ауысу ===== */
+const TABS=[["home","Басты"],["form","Формулалар"],["prob","Есептер"],["logic","Логика"],["test","AI тест"],["set","Баптау"]];
+$("#nav").innerHTML=TABS.map(([id,n])=>`<button data-id="${id}" onclick="show('${id}')">${n}</button>`).join("");
+function show(id){
+  tab=id;if(id!="prob")closeQK();
+  TABS.forEach(([i])=>$("#"+i).hidden=i!=id);
+  document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("on",b.dataset.id==id));
+  if(id=="home")ui();
+  if(id=="set")drawSet();
+}
+
+/* ===== Формулаларды жаттау ===== */
+const F=[
+["geo","Тіктөртбұрыштың ауданы","S = a · b"],["geo","Шаршының периметрі","P = 4a"],
+["geo","Үшбұрыштың ауданы","S = ½ · a · h"],["geo","Шеңбердің ұзындығы","C = 2πr"],
+["geo","Дөңгелектің ауданы","S = πr²"],["geo","Шардың көлемі","V = 4/3 · πr³"],
+["dar","Пифагор теоремасы","c² = a² + b²"],["dar","Қосындының квадраты","(a + b)² = a² + 2ab + b²"],
+["dar","Квадраттар айырмасы","a² − b² = (a − b)(a + b)"],["teng","Дискриминант","D = b² − 4ac"],
+["teng","Квадрат теңдеудің түбірі","x = (−b ± √D) / 2a"],["payiz","a санының p пайызы","a · p / 100"],
+["arif","Арифметикалық прогрессия","aₙ = a₁ + (n − 1)d"]
+];
+let fc=null,fci=0,T0=Date.now();
+function nextCard(){
+  const w=F.map(f=>1.1-P(f[0]));let r=Math.random()*w.reduce((a,b)=>a+b,0),i=0;
+  while(r>w[i]&&i<F.length-1){r-=w[i];i++}
+  fci=i;fc=F[i];T0=Date.now();$("#fT").textContent=TOPICS[fc[0]];$("#fN").textContent=fc[1];
+  $("#fB").innerHTML='<button class="pri" onclick="flip()">Жауабын көрсету</button><button onclick="wr()">Жауабын жазу</button>';
+}
+function flip(){
+  $("#fN").textContent=fc[2];
+  $("#fB").innerHTML='<button onclick="grade(true)">Білемін</button><button onclick="grade(false)">Білмедім</button>';
+}
+const nz=t=>t.toLowerCase().replace(/[\s·*×⋅.]/g,"").replace(/\^2/g,"²").replace(/\^3/g,"³").replace(/pi/g,"π").replace(/sqrt/g,"√").replace(/-/g,"−");
+function wr(){
+  $("#fB").innerHTML='<input id="fa" placeholder="Формуланы жаз, мыс: S = a b" autocomplete="off" onkeydown="if(event.key==\'Enter\')chkF()"><button class="pri" onclick="chkF()">Тексеру</button><button onclick="flip()">Жауабын көрсету</button>';$("#fa").focus();
+}
+function chkF(){
+  const v=$("#fa").value;if(!v.trim())return;
+  if(nz(v)==nz(fc[2])){grade(true);cheer()}
+  else{$("#fN").textContent=fc[2];$("#fB").innerHTML='<span class="bad">Дұрыс емес. Дұрыс жауап жоғарыда.</span><button onclick="grade(false)">Келесі</button>'}
+}
+function grade(ok){
+  bkt(fc[0],ok);rec(fc[0],ok,(Date.now()-T0)/1000);
+  if(ok)S.fk[fci]=1;else delete S.fk[fci];
+  if(ok){S.streak++;addXP(5)}else{S.streak=0;ui()}save();nextCard();
+}
+
+/* ===== Есептер генераторы: деңгей өскен сайын қиындай түседі (l = 1, 2, 3 ...) ===== */
+const sn=n=>String(n).replace(".",",").replace("-","−");
+const sg=n=>n<0?"− "+(-n):"+ "+n;
+const GEN={
+arif(l){const m=Math.ceil(l*2/3),a=R(2,4+l),b=R(2,9+(l>>1)),c=R(2,9+(l>>1));
+  if(m<=2)return R(0,1)?{q:`${a} + ${b} × ${c}`,a:a+b*c,h:"Алдымен көбейту, содан кейін қосу."}:{q:`${a} − ${b} × ${c}`,a:a-b*c,h:"Алдымен көбейту, содан кейін азайту. Жауап теріс болуы мүмкін."};
+  if(m<=4){const d=R(1,10*l+10);return{q:`(${a} + ${b}) × ${c} − ${d}`,a:(a+b)*c-d,h:"Алдымен жақша ішін есепте."}}
+  const x=R(2,9);
+  if(m<=7)return{q:`${a} × ${b} − ${c} × ${x}`,a:a*b-c*x,h:"Екі көбейтіндіні бөлек тауып, азайт."};
+  if(m<=10){const d=R(1,a+c*x+10);return{q:`${a*b} ÷ ${b} + ${c} × ${x} − ${d}`,a:a+c*x-d,h:"Бөлу мен көбейтуді алдымен орында."}}
+  const y=R(2,9),d=R(1,(a+c)*x);
+  return{q:`(${a*b} ÷ ${b} + ${c}) × ${x} − ${y} × ${d}`,a:(a+c)*x-y*d,h:"Жақша ішін, сосын көбейтуді орында."}},
+teng(l){const m=Math.ceil(l*2/3),w=8+l,x=R(-w,w),a=R(2,9),b=R(1,10+l);
+  if(m<=1)return{q:`x + ${b} = ${sn(x+b)}.  x = ?`,a:x,h:"Қосылғышты екінші жаққа азайтып аудар."};
+  if(m==2)return{q:`${a}x + ${b} = ${sn(a*x+b)}.  x = ?`,a:x,h:`Алдымен ${b}-ны азайт, сосын ${a}-ға бөл.`};
+  if(m<=4)return{q:`${a}(x + ${b}) = ${sn(a*(x+b))}.  x = ?`,a:x,h:`Екі жағын ${a}-ға бөл, сосын ${b}-ны азайт.`};
+  if(m<=6){const c=R(2,6),A=c+R(1,5);return{q:`${A}x + ${b} = ${c}x ${sg(b+(A-c)*x)}.  x = ?`,a:x,h:"x-ті бір жаққа, сандарды екінші жаққа жина."}}
+  if(m<=8){const c=R(1,20),X=b+R(-10,10);return{q:`${a}(x − ${b}) + ${c} = ${sn(a*(X-b)+c)}.  x = ?`,a:X,h:`Алдымен ${c}-ны азайт, сосын ${a}-ға бөл, соңында ${b}-ны қос.`}}
+  const r1=R(-(5+l),5+l),r2=r1+R(1,6);
+  return{q:`x² ${sg(-(r1+r2))}x ${sg(r1*r2)} = 0.  Кіші түбірі x = ?`,a:r1,h:"Виет теоремасы: түбірлердің қосындысы мен көбейтіндісін қара."}},
+payiz(l){const m=Math.ceil(l*2/3),k=R(1,10+l),n=20*k,j=R(1,8);
+  if(m<=1){const p=pick([10,50,25]);return{q:`${n}-тің ${p}% = ?`,a:n*p/100,h:"a · p / 100"}}
+  if(m==2){const p=pick([5,15,20,30,40]);return{q:`${n}-тің ${p}% = ?`,a:n*p/100,h:"a · p / 100"}}
+  if(m<=4){const p=5*j;return R(0,1)?{q:`Бағасы ${n} теңге тауарға ${p}% жеңілдік. Жаңа баға (теңге)?`,a:n*(100-p)/100,h:"Бағаны (100 − p)% деп есепте."}:{q:`Тауарды ${n} теңгеге сатып алып, ${p}% арзанға сатты. Пайда қанша теңге? (шығын болса, теріс сан)`,a:-(n*p/100),h:"Шығын: сатып алу бағасының p%-ы, ол теріс таңбамен жазылады."}}
+  if(m<=6){const p=5*j;return{q:`Бағасы ${n} теңге тауар ${p}% қымбаттады. Жаңа баға (теңге)?`,a:n*(100+p)/100,h:"Бағаны (100 + p)% деп есепте."}}
+  if(m<=8){const n2=100*R(1,5+l),p1=10*R(1,5),p2=10*R(1,5);return{q:`Бағасы ${n2} теңге тауар алдымен ${p1}% арзандады, сосын жаңа бағадан ${p2}% қымбаттады. Соңғы баға (теңге)?`,a:n2/100*(100-p1)*(100+p2)/100,h:"Әр қадамды бөлек есепте: жаңа бағадан келесі пайыз алынады."}}
+  const p=pick([20,25,40,50,60,80]),x=20*R(2,10+l);
+  return{q:`Белгісіз санның ${p}% = ${x*p/100}.  Сан = ?`,a:x,h:"Сан = мән · 100 / p"}},
+geo(l){const m=Math.ceil(l*2/3),a=R(3,10+l),b=R(2,8+l);
+  if(m<=1)return pick([{q:`Қабырғалары ${a} және ${b} тіктөртбұрыштың ауданы?`,a:a*b,h:"S = a · b"},{q:`Қабырғалары ${a} және ${b} тіктөртбұрыштың периметрі?`,a:2*(a+b),h:"P = 2(a + b)"}]);
+  if(m==2){const c=2*R(2,6);return{q:`Табаны ${c}, биіктігі ${b} үшбұрыштың ауданы?`,a:c*b/2,h:"S = ½ · a · h"}}
+  if(m<=4)return{q:`Радиусы ${b} дөңгелектің ауданы? (π = 3,14; жауабы 0,01 дәлдікпен)`,a:+(3.14*b*b).toFixed(2),h:"S = πr²"};
+  if(m<=6){const h=2*R(2,6),c=a+2*R(1,5);return{q:`Табандары ${a} және ${c}, биіктігі ${h} трапецияның ауданы?`,a:(a+c)*h/2,h:"S = (a + b)/2 · h"}}
+  if(m<=8){const h=R(2,9);return pick([{q:`Радиусы ${b} шеңбердің ұзындығы? (π = 3,14; жауабы 0,01 дәлдікпен)`,a:+(2*3.14*b).toFixed(2),h:"C = 2πr"},{q:`Радиусы ${b}, биіктігі ${h} цилиндрдің көлемі? (π = 3,14)`,a:+(3.14*b*b*h).toFixed(2),h:"V = πr²h"}])}
+  if(m<=10){const r=3*R(1,3);return{q:`Радиусы ${r} шардың көлемі? (π = 3,14; жауабы 0,01 дәлдікпен)`,a:+(4*3.14*r**3/3).toFixed(2),h:"V = 4/3 · πr³"}}
+  const r=3*R(1,4),h=R(2,9);return{q:`Радиусы ${r}, биіктігі ${h} конустың көлемі? (π = 3,14; жауабы 0,01 дәлдікпен)`,a:+(3.14*r*r*h/3).toFixed(2),h:"V = ⅓ · πr²h"}},
+dar(l){const m=Math.ceil(l*2/3),a=R(2,10+l);
+  if(m<=1)return R(0,1)?{q:`${a}² = ?`,a:a*a,h:"a² = a · a"}:{q:`−${a}² = ?`,a:-a*a,h:"Алдымен дәрежеге шығар, сосын минус қой."};
+  if(m==2)return R(0,1)?{q:`√${a*a} = ?`,a:a,h:"Квадраты осы санға тең оң санды тап."}:{q:`−√${a*a} = ?`,a:-a,h:"Түбірді тауып, алдына минус қой."};
+  if(m<=4){const k=R(1,m-1),[x,y,z]=pick([[3,4,5],[5,12,13],[8,15,17],[6,8,10]]);return{q:`Катеттері ${x*k} және ${y*k} тікбұрышты үшбұрыштың гипотенузасы?`,a:z*k,h:"c² = a² + b²"}}
+  if(m<=6){const n=R(2,9),e=R(5,10);return pick([{q:`${n}³ = ?`,a:n**3,h:"n³ = n · n · n"},{q:`(−${n})³ = ?`,a:-(n**3),h:"Теріс санның тақ дәрежесі теріс болады."},{q:`2^${e} = ?`,a:2**e,h:"2-ні e рет өзіне көбейт."}])}
+  if(m<=8){const A=R(6,9+l),B=R(2,A+6);return{q:`${A}² − ${B}² = ?`,a:A*A-B*B,h:"a² − b² = (a − b)(a + b)"}}
+  if(m<=10){const p=R(2,6),r=R(2,6),e=R(3,9);return pick([{q:`2^${p} × 2^${r} = ?`,a:2**(p+r),h:"Дәреже көрсеткіштерін қос: aᵐ · aⁿ = aᵐ⁺ⁿ"},{q:`(−2)^${e} = ?`,a:(-2)**e,h:"Көрсеткіш тақ болса, жауап теріс."}])}
+  const n=R(2,12);return{q:`³√(−${n**3}) + √${a*a} = ?`,a:a-n,h:"Куб және квадрат түбірді бөлек тап."}}
+};
+function fillTopics(){$("#topic").innerHTML='<option value="mix">Аралас</option>'+Object.keys(TOPICS).map(t=>`<option value="${t}">${TOPICS[t]}</option>`).join("")}
+fillTopics();
+let cur=null,answered=false,Q0=Date.now();
+function newQ(){
+  const sel=$("#topic").value,t=sel=="mix"?pick(Object.keys(TOPICS)):sel,l=level(t);
+  cur={t,l,...GEN[t](l)};answered=false;Q0=Date.now();
+  $("#q").textContent=cur.q;$("#qm").textContent=`${TOPICS[t]}, ${l}-деңгей. Келесі деңгейге: ${S.sv>=720?0:40-S.sv%40} есеп`;
+  $("#fb").textContent="";$("#fb").className="";$("#ans").value="";$("#chk").textContent="Тексеру";$("#ans").focus();
+}
+function check(){
+  if(answered)return newQ();
+  const fb=$("#fb"),v=parseFloat($("#ans").value.replace(",",".").replace(/[−–—]/g,"-"));
+  if(!isFinite(v)){fb.textContent="Жауапты сан түрінде енгізіңіз, мысалы 12, −5 немесе 3,5.";fb.className="bad";return}
+  const ok=Math.abs(v-cur.a)<0.011;answered=true;bkt(cur.t,ok);rec(cur.t,ok,(Date.now()-Q0)/1000);
+  if(ok){const xp=Math.min(10+2*cur.l,30),lu=solved();S.streak++;fb.textContent=`Дұрыс! +${xp} XP. Формула: ${cur.h}`;fb.className="ok";addXP(xp);cheer(lu)}
+  else{S.streak=0;fb.textContent=`Дұрыс жауап: ${sn(cur.a)}. Кеңес: ${cur.h}`;fb.className="bad";ui()}
+  save();$("#chk").textContent="Келесі есеп";
+}
+
+/* ===== Жылдам жауап: арифметика және теңдеулер, 4 нұсқа, әр есепке 40 секунд ===== */
+const QT=["arif","teng"],QSEC=40;
+let qk=null,qkAns=true,qkT0=0,qkLast=0,qkTim=null;
+function mkOpts(a){const o=[a];for(const v of shuf([a+1,a-1,a+2,a-2,a+3,a-3,a+4,a-4,a+5,a-5,a+10,a-10,-a,a*2]))if(o.length<4&&!o.includes(v))o.push(v);return shuf(o)}
+$("#qkT").innerHTML='<option value="mix">Аралас</option>'+QT.map(t=>`<option value="${t}">${TOPICS[t]}</option>`).join("");
+function openQK(){$("#qks").hidden=true;$("#qkv").hidden=false;newQK()}
+function closeQK(){clearInterval(qkTim);qkAns=true;$("#qkv").hidden=true;$("#qks").hidden=false}
+function newQK(){
+  clearInterval(qkTim);
+  const sel=$("#qkT").value,t=QT.includes(sel)?sel:pick(QT),l=level(t);
+  qk={t,l,...GEN[t](l)};qkAns=false;qkT0=qkLast=Date.now();
+  $("#qkQ").textContent=qk.q;$("#qkM").textContent=`${TOPICS[t]}, ${l}-деңгей`;
+  $("#qkF").textContent="";$("#qkF").className="";$("#qkN").hidden=true;
+  $("#qkO").innerHTML=mkOpts(qk.a).map(v=>`<button data-v="${v}" onclick="endQK(${v})">${sn(v)}</button>`).join("");
+  qkTick();qkTim=setInterval(qkTick,250);
+}
+function qkTick(){
+  if(qkAns){clearInterval(qkTim);return}
+  const now=Date.now();
+  if(document.hidden){qkT0+=now-qkLast;qkLast=now;return}
+  qkLast=now;
+  const left=Math.max(0,QSEC-(now-qkT0)/1000);
+  $("#qkS").textContent=Math.ceil(left);$("#qkB").style.width=(left/QSEC*100)+"%";$("#qkB").className=left<=10?"low":"";
+  if(left<=0)endQK(null);
+}
+function endQK(v){
+  if(qkAns)return;qkAns=true;clearInterval(qkTim);
+  const ok=v===qk.a,f=$("#qkF");bkt(qk.t,ok);rec(qk.t,ok,Math.min(QSEC,(Date.now()-qkT0)/1000));
+  document.querySelectorAll("#qkO button").forEach(b=>{b.disabled=true;const x=+b.dataset.v;if(x===qk.a)b.classList.add("rt");else if(x===v)b.classList.add("xx")});
+  if(ok){const xp=Math.min(5+qk.l,15),lu=solved();S.streak++;f.textContent=`Дұрыс! +${xp} XP`;f.className="ok";addXP(xp);cheer(lu)}
+  else{S.streak=0;f.textContent=(v===null?"Уақыт бітті. ":"")+`Дұрыс жауап: ${sn(qk.a)}`;f.className="bad";ui()}
+  save();$("#qkN").hidden=false;
+}
+
+/* ===== 3-апта: CSP. Судоку: backtracking + MRV + forward checking ===== */
+function cand(g,i){
+  const r=i>>2,c=i&3,u=new Set();
+  for(let k=0;k<4;k++){u.add(g[r*4+k]);u.add(g[k*4+c])}
+  const br=r&2,bc=c&2;for(let y=0;y<2;y++)for(let x=0;x<2;x++)u.add(g[(br+y)*4+bc+x]);
+  return [1,2,3,4].filter(v=>!u.has(v));
+}
+function mrv(g){let b=-1,bd=null;for(let i=0;i<16;i++)if(!g[i]){const d=cand(g,i);if(!bd||d.length<bd.length){b=i;bd=d}}return[b,bd]}
+function solve(g,out,lim){
+  const [b,bd]=mrv(g);
+  if(b<0){if(out&&!out.s)out.s=g.slice();return 1}
+  let n=0;for(const v of bd){g[b]=v;n+=solve(g,out,lim);g[b]=0;if(n>=lim)break}return n;
+}
+function conf(g){
+  const s=new Set();
+  for(let i=0;i<16;i++)if(g[i])for(let j=0;j<16;j++)if(j!=i&&g[j]==g[i]){
+    const r=i>>2,c=i&3,r2=j>>2,c2=j&3;
+    if(r==r2||c==c2||((r>>1)==(r2>>1)&&(c>>1)==(c2>>1)))s.add(i);
+  }
+  return s;
+}
+let sd=null;
+function makePuzzle(lv){
+  const g=Array(16).fill(0);shuf([1,2,3,4]).forEach((v,i)=>g[i]=v);
+  const o={};solve(g,o,1);const p=o.s.slice();let rem=0;
+  for(const i of shuf([...Array(16).keys()])){
+    if(rem>=[6,9,11][lv])break;
+    const k=p[i];p[i]=0;
+    if(solve(p.slice(),null,2)===1)rem++;else p[i]=k;
+  }
+  return p;
+}
+function newSudoku(){
+  const p=makePuzzle(+$("#sdl").value);
+  sd={g:p.slice(),giv:p.map(v=>v>0),sel:-1,hints:0,done:false};
+  $("#sdm").textContent="Ұяшықты таңдап, санды бас.";drawSd();
+}
+function drawSd(){
+  const cf=conf(sd.g);
+  $("#sdg").innerHTML=sd.g.map((v,i)=>`<button class="${sd.giv[i]?"giv":""} ${sd.sel==i?"sel":""} ${cf.has(i)?"err":""}" onclick="selCell(${i})" aria-label="Ұяшық ${(i>>2)+1}-жол ${(i&3)+1}-баған">${v||""}</button>`).join("");
+  $("#sdp").innerHTML=[1,2,3,4,0].map(n=>`<button onclick="put(${n})">${n||"Өшіру"}</button>`).join("");
+}
+function selCell(i){if(sd.done)return;sd.sel=i;drawSd()}
+function put(n){
+  if(sd.done||sd.sel<0||sd.giv[sd.sel]){$("#sdm").textContent="Алдымен бос ұяшықты таңда.";return}
+  sd.g[sd.sel]=n;drawSd();winCheck();
+}
+function winCheck(){
+  if(sd.g.every(v=>v)&&!conf(sd.g).size){
+    sd.done=true;const xp=Math.max(10,40-10*sd.hints);S.sud++;rec(null,true,0);
+    $("#sdm").textContent=`Тамаша! Судоку шешілді. +${xp} XP`;$("#sdm").className="ok";addXP(xp);cheer("🧩 Судоку шешілді! Құттықтаймыз!");
+  }
+}
+function hint(){
+  if(!sd||sd.done)return;const m=$("#sdm");m.className="mut";
+  if(conf(sd.g).size){m.textContent="Алдымен қызыл ұяшықтардағы қайшылықты түзет.";return}
+  const o={};if(!solve(sd.g.slice(),o,1)){m.textContent="Қазіргі толтыруың тығырыққа апарады: соңғы қойған сандарды өшір.";return}
+  const [b,bd]=mrv(sd.g);sd.g[b]=o.s[b];sd.hints++;sd.sel=b;
+  m.textContent=bd.length==1?`${(b>>2)+1}-жол, ${(b&3)+1}-бағанда тек ${bd[0]} қалады: нұсқасы ең аз ұяшықтан бастаймыз (MRV).`:`${(b>>2)+1}-жол, ${(b&3)+1}-бағанда ${bd.join(", ")} мүмкін; шешімі ${o.s[b]}.`;
+  drawSd();winCheck();
+}
+
+/* ===== 4-апта: Minimax + Alpha-Beta. Тас алу ойыны ===== */
+function ab(n,max,d,a,b,c){
+  c.n++;
+  if(n==0)return max?-1:1;   // соңғы тасты алған ұтады
+  if(d==0)return 0;
+  if(max){let v=-2;for(let k=1;k<=3&&k<=n;k++){v=Math.max(v,ab(n-k,false,d-1,a,b,c));a=Math.max(a,v);if(a>=b)break}return v}
+  let v=2;for(let k=1;k<=3&&k<=n;k++){v=Math.min(v,ab(n-k,true,d-1,a,b,c));b=Math.min(b,v);if(a>=b)break}return v;
+}
+function aiMove(n,depth){
+  const c={n:0};let best=-3,ms=[];
+  for(let k=1;k<=3&&k<=n;k++){const v=ab(n-k,false,depth,-2,2,c);if(v>best){best=v;ms=[k]}else if(v==best)ms.push(k)}
+  return{k:pick(ms),v:best,nodes:c.n};
+}
+let nm=null;
+function newNim(){nm={n:R(12,19),over:false,busy:false,depth:+$("#nl").value};$("#nm").textContent="Сен бірінші жүресің.";$("#nm").className="";drawNim()}
+function drawNim(){
+  $("#stn").innerHTML="<span></span>".repeat(nm.n);
+  $("#nbt").innerHTML=[1,2,3].map(k=>`<button class="pri" onclick="take(${k})" ${nm.over||nm.busy||k>nm.n?"disabled":""}>${k} тас</button>`).join("");
+}
+function take(k){
+  nm.n-=k;const m=$("#nm");
+  if(nm.n==0){nm.over=true;m.textContent="Сен ұттың! +"+(nm.depth>2?60:25)+" XP";m.className="ok";S.streak++;S.win++;rec(null,true,0);addXP(nm.depth>2?60:25);cheer("🏆 AI-ды жеңдің! Құттықтаймыз!");drawNim();return}
+  nm.busy=true;m.textContent="AI ойланып жатыр…";m.className="mut";drawNim();
+  setTimeout(()=>{
+    const r=aiMove(nm.n,nm.depth);nm.n-=r.k;nm.busy=false;
+    const ev=r.v>0?"ұтатынын біледі":r.v<0?"ұтылатынын көріп тұр":"нәтижені әлі білмейді";
+    if(nm.n==0){nm.over=true;S.streak=0;rec(null,false,0);ui();m.textContent=`AI ${r.k} тас алып, ұтты. Қайта көр!`;m.className="bad"}
+    else{m.textContent=`AI ${r.k} тас алды (${r.nodes} күйді қарады, ${ev}). Сенің кезегің.`;m.className=""}
+    drawNim();
+  },450);
+}
+function nimHint(){
+  if(!nm)return;const r=nm.n%4;
+  $("#nm").className="mut";
+  $("#nm").textContent=r==0?"Қалған тас саны 4-ке еселі (n mod 4 = 0): қазір сен қиын жағдайдасың. AI қателессе ғана ұтасың.":`Ұтатын жүріс: ${r} тас ал, сонда қалғаны 4-ке еселі болады. Әр айналымда сен пен AI қосындысы 4 тас болсын.`;
+}
+
+/* ===== Сандар тізбегі ===== */
+let sq=null,sqDone=false;
+function newSeq(){
+  const m=Math.min(ulv(),12),t=R(0,4),a=R(1,9+m),d=R(2,7+m);let s=[],h="";
+  if(t==0){s=[0,1,2,3,4,5].map(k=>a+d*k);h=`Әр келесі сан ${d}-ге артады.`}
+  else if(t==1){const r=R(2,m>6?4:3);s=[0,1,2,3,4,5].map(k=>a*r**k);h=`Әр келесі сан ${r} есе артады.`}
+  else if(t==2){const n=R(1,6+m);s=[0,1,2,3,4,5].map(k=>(n+k)**2);h="Бұл тізбек натурал сандардың квадраттары."}
+  else if(t==3){const x=R(1,4),y=R(1,5);s=[x,y];while(s.length<6)s.push(s[s.length-1]+s[s.length-2]);h="Әр сан алдыңғы екі санның қосындысына тең."}
+  else{s=[a];for(let k=1;k<6;k++)s.push(s[k-1]+(k%2?d:-1));h=`Кезекпен +${d} және −1 қосылады.`}
+  sq={a:s[5],q:s.slice(0,5).join(",  ")+",  ?",h};sqDone=false;
+  $("#sqq").textContent=sq.q;$("#sqa").value="";$("#sqm").textContent="";$("#sqm").className="";$("#sqb").textContent="Тексеру";
+}
+function sqCheck(){
+  if(sqDone)return newSeq();
+  const v=parseInt($("#sqa").value,10),m=$("#sqm");
+  if(isNaN(v)){m.textContent="Санды енгіз.";m.className="bad";return}
+  sqDone=true;$("#sqb").textContent="Келесі тізбек";rec(null,v===sq.a,0);
+  if(v===sq.a){m.textContent="Дұрыс! +15 XP. "+sq.h;m.className="ok";S.streak++;addXP(15);cheer()}
+  else{S.streak=0;save();ui();m.textContent="Дұрыс жауап: "+sq.a+". "+sq.h;m.className="bad"}
+}
+function sqHint(){if(sq){$("#sqm").textContent="Көрші сандардың айырмасын немесе қатынасын қарап көр.";$("#sqm").className="mut"}}
+
+/* ===== Автоматты тесттер ===== */
+function runTests(){
+  const T=[
+    ["Байес: дұрыс жауап меңгеруді арттырады",()=>bkt("arif",true,false)>P("arif")],
+    ["Байес: қате жауап меңгеруді азайтады",()=>bkt("arif",false,false)<P("arif")],
+    ["CSP: 4×4 судоку жалғыз шешімді жасалады",()=>{const p=makePuzzle(1);return solve(p.slice(),null,2)===1}],
+    ["CSP: шешім қайшылықсыз",()=>{const o={};solve(Array(16).fill(0),o,1);return o.s.every(v=>v)&&conf(o.s).size==0}],
+    ["Minimax: 4 тас қалса, жүретін ойыншы ұтылады",()=>ab(4,true,20,-2,2,{n:0})===-1],
+    ["Minimax: 5 тас қалса, жүретін ойыншы ұтады",()=>ab(5,true,20,-2,2,{n:0})===1],
+    ["AI 9 тастан 1 тас алады (қалғаны 8)",()=>aiMove(9,20).k===1],
+    ["Есептер генераторы: 1–18 деңгей, 720 есеп, жауабы сан",()=>{for(let i=0;i<720;i++){const t=pick(Object.keys(TOPICS)),g=GEN[t](1+i%18);if(!isFinite(g.a)||!g.q)return false}return true}],
+    ["Теріс жауаптар кездеседі",()=>{let n=0;for(let i=0;i<400;i++)if(GEN[pick(["arif","teng","dar"])](R(1,18)).a<0)n++;return n>20}],
+    ["18 деңгей: әр деңгей 40 есеп, барлығы 720",()=>{const s0=S.sv,r=[0,39,40,679,720].map(v=>{S.sv=v;return ulv()});S.sv=s0;return r.join()=="1,1,2,17,18"}],
+    ["Жылдам жауап: 4 нұсқа, біреуі дұрыс",()=>{for(let i=0;i<200;i++){const a=R(-60,60),o=mkOpts(a);if(o.length!=4||new Set(o).size!=4||!o.includes(a))return false}return true}],
+    ["Қате енгізу: сан емес мәтін қабылданбайды",()=>!isFinite(parseFloat("abc".replace(",",".")))]
+  ];
+  $("#tr").innerHTML=T.map(([n,f])=>{let ok=false;try{ok=!!f()}catch(e){}return `<div class="t"><b class="${ok?"ok":"bad"}">${ok?"Өтті":"Қате"}</b>${n}</div>`}).join("");
+}
+
+/* ===== Аккаунт, баптау, құттықтау ===== */
+let mode="in";let fails=+LS.get("dabo_fail")||0;
+const EYE_ON='<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>',EYE_OFF='<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.9 10.9 0 0 1 12 19C5 19 1 12 1 12a18.6 18.6 0 0 1 5.06-5.94M9.9 4.24A9.1 9.1 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19M14.12 14.12a3 3 0 1 1-4.24-4.24"/><path d="M1 1l22 22"/></svg>';
+function togglePw(){const i=$("#aP"),sh=i.type=="password";i.type=sh?"text":"password";$("#eye").innerHTML=sh?EYE_OFF:EYE_ON;$("#eye").setAttribute("aria-pressed",sh);$("#eye").setAttribute("aria-label",sh?"Парольді жасыру":"Парольді көрсету")}
+const uk=l=>"u_"+l;
+function fbHash(s){let h=5381;for(const c of s)h=(h*33^c.charCodeAt(0))>>>0;return"x"+h}
+function forgot(){authMode("in");mode="rs";$("#aT").textContent="Жаңа пароль қою";$("#aGo").textContent="Парольді жаңарту";$("#aSw").textContent="Артқа: кіру";$("#aE").textContent="Логинді және жаңа парольді (кемінде 6 таңба) жаз.";$("#aE").className="mut"}
+async function hash(s){try{const b=await crypto.subtle.digest("SHA-256",new TextEncoder().encode("dabo:"+s));return[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,"0")).join("")}catch(e){let h=5381;for(const c of s)h=(h*33^c.charCodeAt(0))>>>0;return"x"+h}}
+function authMode(m){mode=m;$("#aT").textContent=m=="in"?"Кіру":"Тіркелу";$("#aGo").textContent=m=="in"?"Кіру":"Тіркелу";$("#aSw").textContent=m=="in"?"Тіркелгім жоқ: тіркелу":"Тіркелгім бар: кіру";$("#aE").textContent="";$("#aE").className="bad";$("#aF").hidden=!(m=="in"&&fails>=6)}
+async function authGo(){
+  const raw=$("#aL").value.trim(),l=uk(raw.toLowerCase()),p=$("#aP").value,e=$("#aE");
+  e.className="bad";if(raw.length<3){e.textContent="Логин кемінде 3 таңба болсын.";return}
+  if(p.length<6){e.textContent="Пароль кемінде 6 таңба болсын.";return}
+  const p2=p.trim(),h=await hash(raw.toLowerCase()+":"+p2),alt=[await hash(raw.toLowerCase()+":"+p),fbHash(raw.toLowerCase()+":"+p),fbHash(raw.toLowerCase()+":"+p2)];
+  if(mode=="rs"){if(!U[l]){e.textContent="Бұл логинмен аккаунт жоқ.";e.className="bad";return}U[l].h=h;login(l);return}
+  if(mode=="up"){if(U[l]){e.textContent="Бұл логин бос емес.";return}U[l]={h,d:{...DEF(),nick:raw}}}
+  else if(!U[l]||(U[l].h!==h&&!alt.includes(U[l].h))){fails++;LS.set("dabo_fail",fails);e.textContent="Логин немесе пароль қате."+(fails>=6?" Парольді жаңарту үшін төмендегі батырманы бас.":"");$("#aF").hidden=fails<6;return}
+  login(l);
+}
+function login(l){fails=0;LS.set("dabo_fail",0);CUR=l;LS.set("dabo_cur",l);const d0=U[l].d||{};if(!("sv" in d0))d0.sv=Math.min(680,Math.floor((d0.xp||0)/100)*40);S=Object.assign(DEF(),d0);save();touchDay();$("#auth").hidden=true;$("#aP").value="";applyBg();show("home")}
+function logout(){save();CUR="";LS.set("dabo_cur","");S=DEF();$("#auth").hidden=false;authMode("in");show("home")}
+const BG=["","linear-gradient(135deg,#a1c4fd,#c2e9fb)","linear-gradient(135deg,#a8e6cf,#dcedc1)","linear-gradient(135deg,#ffb88c,#ffd6a5)","linear-gradient(135deg,#667eea,#764ba2)","linear-gradient(135deg,#f093fb,#f5576c)"];
+const bgE=(g,a,b)=>{const v=`<svg xmlns="http://www.w3.org/2000/svg" width="72" height="72"><text x="6" y="30" font-size="26" opacity=".6">${a}</text><text x="38" y="62" font-size="26" opacity=".6">${b}</text></svg>`;return `url("data:image/svg+xml,${encodeURIComponent(v)}") 0 0/72px 72px,${g}`};
+BG.push(bgE("linear-gradient(#ffe0ec,#ffd1e3)","🐱","🐶"),bgE("linear-gradient(#cfe8ff,#e3f2ff)","🚀","⭐"),bgE("linear-gradient(#fff3c4,#ffe7a0)","🍎","🍌"),bgE("linear-gradient(#d9f7d9,#c3efc3)","⚽","🏀"),bgE("linear-gradient(#f0e0ff,#e4d0fa)","🌸","🦋"),bgE("linear-gradient(#e0f4f1,#cdeee9)","➕","✖️"));
+function paintSw(){document.querySelectorAll(".sw").forEach(b=>{b.style.background=BG[b.dataset.i]||"var(--bg)"})}
+function applyBg(){document.body.style.background=BG[S.bg]||"";document.body.style.backgroundAttachment="fixed"}
+function drawSet(){
+  $("#avb").src=S.av||"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3E%3Ctext x='5' y='7.5' font-size='7' text-anchor='middle'%3E🙂%3C/text%3E%3C/svg%3E";
+  $("#nkI").value=S.nick||"";drawPromo();
+  $("#bgs").innerHTML=BG.map((b,i)=>`<button class="sw ${S.bg==i?"on":""}" data-i="${i}" onclick="setBg(${i})" aria-label="Фон ${i+1}"></button>`).join("");paintSw();
+}
+const PROMO="астана",LV8=700;
+function drawPromo(){
+  const ok=ulv()>=8;
+  $("#pi").textContent=ok?"🎁 Құттықтаймыз! 8-деңгейге жеттің. Сенің марапатың — промокод: Астана":"🎁 Промокод 8-деңгейге жеткенде беріледі (қазір: "+ulv()+"-деңгей).";
+  $("#pr").hidden=!S.promo;$("#pm").textContent="";$("#pc").value="";
+}
+function usePromo(){
+  const v=$("#pc").value.trim().toLowerCase(),m=$("#pm");
+  if(!v){m.textContent="Промокодты жаз.";m.className="bad";return}
+  
+  if(v!==PROMO){m.textContent="Промокод қате.";m.className="bad";return}
+  S.promo=true;save();drawPromo();openLetter();cheer("💐 Промокод дұрыс!");
+}
+function openLetter(){$("#letter").hidden=false;$("#letter").scrollTop=0}
+function setBg(i){S.bg=i;save();applyBg();drawSet()}
+function saveNick(){S.nick=$("#nkI").value.trim().slice(0,20);save();ui();cheer("✅ Никнейм сақталды!")}
+function upAv(inp){
+  const f=inp.files[0];if(!f)return;const r=new FileReader();
+  r.onload=()=>{const im=new Image();im.onload=()=>{
+    const c=document.createElement("canvas");c.width=c.height=128;const x=c.getContext("2d"),s=Math.min(im.width,im.height);
+    x.drawImage(im,(im.width-s)/2,(im.height-s)/2,s,s,0,0,128,128);
+    S.av=c.toDataURL("image/jpeg",.8);save();ui();drawSet()};im.src=r.result};
+  r.readAsDataURL(f);
+}
+const EM=[["🎉","🎊","✨","🥳"],["🌟","⭐","💫","🌠"],["🏆","🥇","🏅","👑"],["🔥","💥","⚡","🚀"],["🦄","🌈","🍭","🎈"],["🐱","🐼","🦊","🐸"],["🍎","🍓","🍉","🍕"],["⚽","🏀","🎯","🎮"]];
+const MS=["Құттықтаймыз!","Тамаша!","Жарайсың!","Керемет!","Өте жақсы!","Сен ең мықтысың!","Зерек екенсің!"];
+let lastE=-1;
+function cheer(t){
+  let k;do{k=R(0,EM.length-1)}while(k==lastE);lastE=k;const e=EM[k];
+  document.querySelectorAll("#toast").forEach(x=>x.remove());
+  const o=document.createElement("div");o.id="toast";o.textContent=e[0]+" "+(t||pick(MS))+" "+e[1];document.body.appendChild(o);
+  for(let n=0;n<20;n++){const x=document.createElement("span");x.className="fall";x.textContent=pick(e);x.style.left=R(2,94)+"vw";x.style.animationDelay=(Math.random()*.6)+"s";document.body.appendChild(x);setTimeout(()=>x.remove(),3000)}
+  setTimeout(()=>o.remove(),1800);
+}
+
+/* ===== Іске қосу ===== */
+authMode("in");
+ui();nextCard();newQ();newSudoku();newNim();newSeq();show("home");
+if(CUR&&U[CUR])login(CUR);else $("#auth").hidden=false;
+</script>
+</body>
+</html>
