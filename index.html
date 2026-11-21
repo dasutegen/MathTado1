@@ -19,6 +19,7 @@ h2{font-size:20px;margin:0 0 8px}
 .top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
 .stats{display:flex;gap:8px;font-weight:700;font-size:14px;flex-wrap:wrap}
 .stats span{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:4px 12px}
+.stats button{border-radius:20px;padding:4px 12px;font-size:18px;line-height:1.3}
 .xp{height:8px;background:var(--line);border-radius:4px;margin:12px 0;overflow:hidden}
 .xp div{height:100%;background:var(--acc);transition:width .4s}
 nav{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:12px}
@@ -70,14 +71,12 @@ h3{font-size:16px;margin:14px 0 8px}
 @keyframes pop{from{transform:translateX(-50%) scale(.5);opacity:0}}
 .fall{position:fixed;top:-40px;z-index:199;font-size:28px;pointer-events:none;animation:fall 2.2s linear forwards}
 @keyframes fall{to{transform:translateY(110vh) rotate(360deg)}}
-/* Жеке оқу жоспары мен қате дәптері */
 .plan{border:2px solid var(--acc);background:linear-gradient(135deg,var(--card),var(--soft))}
 .planline{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
 .planname{font-size:22px;font-weight:800;margin:4px 0}
 .goaltrack{height:10px;background:var(--line);border-radius:8px;overflow:hidden;margin:10px 0}
 .goaltrack i{display:block;height:100%;background:var(--ok);transition:width .3s}
 .erritem{border-top:1px solid var(--line);padding:10px 0}
-/* Басты бет: бақылау тақтасы */
 .dash{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px;margin-bottom:12px}
 .dash .card{margin:0}
 .dash .bar b{width:96px}.dash .bar span{width:64px;text-align:right;font-size:12px;color:var(--mut)}
@@ -134,7 +133,7 @@ h3{font-size:16px;margin:14px 0 8px}
 <p id="aF" class="mut" hidden>Бұл құрылғыда парольді қалпына келтіру жоқ. Ұмытып қалсаң, жаңа логинмен тіркел.</p>
 </div></div>
 <div class="wrap">
-<div class="top"><h1>Math<i></i>Tado</h1><div class="stats"><span class="me"><img id="avi" alt="" hidden><b id="nk"></b></span><span id="sLv"></span><span id="sXp"></span><span id="sSt"></span></div></div>
+<div class="top"><h1>Math<i></i>Tado</h1><div class="stats"><span class="me"><img id="avi" alt="" hidden><b id="nk"></b></span><span id="sLv"></span><span id="sXp"></span><span id="sSt"></span><button id="gear" onclick="show('set')" aria-label="Баптау" title="Баптау">⚙️</button></div></div>
 <div class="xp"><div id="xpb"></div></div>
 <nav id="nav"></nav>
 
@@ -254,7 +253,7 @@ function save(){if(CUR&&U[CUR]){U[CUR].d=S;LS.set("dabo_users",JSON.stringify(U)
 const R=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
 const pick=a=>a[R(0,a.length-1)];
 const shuf=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=R(0,i);[a[i],a[j]]=[a[j],a[i]]}return a};
-const TOPICS={arif:"Арифметика",bolu:"Бөлу",teng:"Теңдеулер",payiz:"Пайыз",geo:"Геометрия",dar:"Дәреже және түбір"};
+const TOPICS={arif:"Арифметика",teng:"Теңдеулер",kvad:"Квадраттық теңдеулер",kmf:"Қысқаша көбейту формулалары",ort:"Өрнектерді түрлендіру",payiz:"Пайыз",geo:"Геометрия",dar:"Дәреже және түбір"};
 const ulv=()=>Math.min(18,1+Math.floor(S.sv/40));
 function addXP(n){S.xp+=n;save();ui()}
 /* Дұрыс шешілген есеп: 18 деңгей x 40 есеп = 720 */
@@ -364,7 +363,7 @@ function bkt(t,ok,store=true){
 /* Q-learning ұсынушысы: күй — меңгеру деңгейі, әрекет — математикалық тақырып. */
 const Q_ALPHA=.25,Q_GAMMA=.8;
 function qState(){const m=Object.keys(TOPICS).reduce((a,t)=>a+P(t),0)/Object.keys(TOPICS).length;return `${Math.min(5,Math.floor((ulv()-1)/3))}:${m<.42?0:m<.68?1:2}`}
-function qRow(s){if(!S.q[s])S.q[s]=Object.fromEntries(Object.keys(TOPICS).map(t=>[t,Math.max(0,1-P(t))]));return S.q[s]}
+function qRow(s){if(!S.q[s])S.q[s]={};const r=S.q[s];Object.keys(TOPICS).forEach(t=>{if(!(t in r))r[t]=Math.max(0,1-P(t))});return r}
 function qChoose(s=qState(),explore=true){const ts=Object.keys(TOPICS),row=qRow(s);if(explore&&Math.random()<Math.max(.08,.25/(1+Math.floor((S.qn||0)/20))))return pick(ts);const best=Math.max(...ts.map(t=>row[t]||0));return pick(ts.filter(t=>Math.abs((row[t]||0)-best)<1e-9))}
 function qLearn(a,s,before,after,correct){const r=Math.max(-1,Math.min(1,(after-before)*4+(correct ? .25 : -.2))),row=qRow(s),next=qRow(qState()),future=Math.max(...Object.keys(TOPICS).map(t=>next[t]||0));row[a]=(row[a]||0)+Q_ALPHA*(r+Q_GAMMA*future-(row[a]||0));S.qn=(S.qn||0)+1;save()}
 function drawPlan(){const t=qChoose(qState(),false),done=S.at[dk(new Date())]||0,goal=5,pct=Math.min(100,Math.round(done/goal*100)),status=done>=goal?`5 әрекеттің бәрін орындадың. Өте жақсы!`:`Күндік мақсат: ${Math.min(done,goal)}/${goal} әрекет.`;$("#learningPlan").innerHTML=`<div class="planline"><div><span class="mut">БҮГІНГІ ЖОСПАР</span><div class="planname">${TOPICS[t]}</div></div><button class="pri" onclick="startSmart('${t}')">Жаттығуды бастау</button></div><div class="goaltrack" aria-label="Күндік мақсат ${Math.min(done,goal)} / ${goal}"><i style="width:${pct}%"></i></div><span class="mut">${status}</span>`}
@@ -375,11 +374,11 @@ const level=t=>ulv();
 
 /* ===== Бөлімдер арасында ауысу ===== */
 const TABS=[["home","Басты"],["form","Формулалар"],["prob","Есептер"],["logic","Логика"],["test","AI тест"],["set","Баптау"]];
-$("#nav").innerHTML=TABS.map(([id,n])=>`<button data-id="${id}" onclick="show('${id}')">${n}</button>`).join("");
+$("#nav").innerHTML=TABS.filter(t=>t[0]!="set").map(([id,n])=>`<button data-id="${id}" onclick="show('${id}')">${n}</button>`).join("");
 function show(id){
   tab=id;if(id!="prob")closeQK();
   TABS.forEach(([i])=>$("#"+i).hidden=i!=id);
-  document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("on",b.dataset.id==id));
+  document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("on",b.dataset.id==id));$("#gear").classList.toggle("on",id=="set");
   if(id=="home")ui();
   if(id=="set")drawSet();
 }
@@ -389,9 +388,21 @@ const F=[
 ["geo","Тіктөртбұрыштың ауданы","S = a · b"],["geo","Шаршының периметрі","P = 4a"],
 ["geo","Үшбұрыштың ауданы","S = ½ · a · h"],["geo","Шеңбердің ұзындығы","C = 2pr"],
 ["geo","Дөңгелектің ауданы","S = pr²"],["geo","Шардың көлемі","V = 4/3 · pr³"],
-["dar","Пифагор теоремасы","c² = a² + b²"],["dar","Қосындының квадраты","(a + b)² = a² + 2ab + b²"],
-["dar","Квадраттар айырмасы","a² − b² = (a − b)(a + b)"],["teng","Дискриминант","D = b² − 4ac"],
-["teng","Квадрат теңдеудің түбірі","x = (−b ± √D) / 2a"],["payiz","a санының p пайызы","a · p / 100"],
+["dar","Пифагор теоремасы","c² = a² + b²"],
+["dar","Дәрежелерді көбейту","aᵐ · aⁿ = aᵐ⁺ⁿ"],
+["kmf","Қосындының квадраты","(a + b)² = a² + 2ab + b²"],
+["kmf","Айырманың квадраты","(a − b)² = a² − 2ab + b²"],
+["kmf","Квадраттар айырмасы","a² − b² = (a − b)(a + b)"],
+["kmf","Кубтар қосындысы","a³ + b³ = (a + b)(a² − ab + b²)"],
+["kmf","Кубтар айырмасы","a³ − b³ = (a − b)(a² + ab + b²)"],
+["kvad","Дискриминант","D = b² − 4ac"],
+["kvad","Квадрат теңдеудің түбірі","x = (−b ± √D) / 2a"],
+["kvad","Виет теоремасы (қосынды)","x₁ + x₂ = −b / a"],
+["kvad","Виет теоремасы (көбейтінді)","x₁ · x₂ = c / a"],
+["ort","Жақшаны ашу","a(b + c) = ab + ac"],
+["ort","Ортақ көбейткішті шығару","ab + ac = a(b + c)"],
+["ort","Көпмүшелерді көбейту","(a + b)(c + d) = ac + ad + bc + bd"],
+["payiz","a санының p пайызы","a · p / 100"],
 ["arif","Арифметикалық прогрессия","aₙ = a₁ + (n − 1)*d"]
 ];
 let fc=null,fci=0,T0=Date.now();
@@ -446,33 +457,26 @@ function drawFormulaDiagram(card){
 const sn=n=>String(n).replace(".",",").replace("-","−");
 const sg=n=>n<0?"− "+(-n):"+ "+n;
 const GEN={
- arif(l){const m=Math.ceil(l*2/3),a=R(2,4+l),b=R(2,9+(l>>1)),c=R(2,9+(l>>1));
-   if(m<=2&&R(0,3)==0){const d=R(2,9),q=R(2,12);return{q:`${d*q} ÷ ${d} = ?`,a:q,h:`Бөлінгіш пен бөлгішті көбейт: ${d} × ${q} = ${d*q}.`}}
-   if(m<=2)return R(0,1)?{q:`${a} + ${b} × ${c}`,a:a+b*c,h:"Алдымен көбейту, содан кейін қосу."}:{q:`${a} − ${b} × ${c}`,a:a-b*c,h:"Алдымен көбейту, содан кейін азайту. Жауап теріс болуы мүмкін."};
-  if(m<=4){const d=R(1,10*l+10);return{q:`(${a} + ${b}) × ${c} − ${d}`,a:(a+b)*c-d,h:"Алдымен жақша ішін есепте."}}
-  const x=R(2,9);
-  if(m<=7)return{q:`${a} × ${b} − ${c} × ${x}`,a:a*b-c*x,h:"Екі көбейтіндіні бөлек тауып, азайт."};
-  if(m<=10){const d=R(1,a+c*x+10);return{q:`${a*b} ÷ ${b} + ${c} × ${x} − ${d}`,a:a+c*x-d,h:"Бөлу мен көбейтуді алдымен орында."}}
-  const y=R(2,9),d=R(1,(a+c)*x);
-  return{q:`(${a*b} ÷ ${b} + ${c}) × ${x} − ${y} × ${d}`,a:(a+c)*x-y*d,h:"Жақша ішін, сосын көбейтуді орында."}},
- bolu(l){const m=Math.ceil(l*2/3),d=R(2,8+l),q=R(2,8+l),c=R(1,8+l),e=R(2,6);
-   if(m<=2)return{q:`${d*q} ÷ ${d} = ?`,a:q,h:`Бөлінгішті бөлгішке бөл: ${d*q} ÷ ${d} = ${q}.`};
-   if(m<=4)return{q:`${d*q} ÷ ${d} + ${c} = ?`,a:q+c,h:`Алдымен ${d*q}-ты ${d}-ға бөл, содан кейін ${c}-ны қос.`};
-   if(m<=6)return{q:`(${d*q} + ${d*c}) ÷ ${d} = ?`,a:q+c,h:"Жақша ішіндегі қосындыны бөлгішке бөл."};
-   if(m<=8)return{q:`${d*q*e} ÷ ${d} ÷ ${e} = ?`,a:q,h:"Бөлуді солдан оңға қарай ретімен орында."};
-   if(m<=10){const n=10*R(12,99);return{q:`${n} ÷ 10 = ?`,a:n/10,h:"10-ға бөлгенде үтірді бір орын солға жылжыт."};}
-   return{q:`(${d*q} ÷ ${d} + ${c}) × ${e} ÷ ${e} = ?`,a:q+c,h:"Алдымен жақша ішіндегі бөлуді орында; көбейту мен бөлуді ретімен есепте."}},
+ /* Арифметика (бөлу амалы осында көшірілді: ÷ белгісімен) */
+ arif(l){const m=Math.ceil(l*2/3),a=R(2,4+l),b=R(2,9+(l>>1)),c=R(2,9+(l>>1)),d=R(2,8+l),q=R(2,8+l),e=R(2,6),x=R(2,9);
+  if(m<=2){const t=R(0,2);
+    if(t==0)return{q:`${d*q} ÷ ${d} = ?`,a:q,h:`${d} × ${q} = ${d*q}, демек жауабы ${q}.`};
+    if(t==1)return{q:`${a} + ${b} × ${c}`,a:a+b*c,h:"Алдымен көбейту, содан кейін қосу."};
+    return{q:`${a} − ${b} × ${c}`,a:a-b*c,h:"Алдымен көбейту, содан кейін азайту. Жауап теріс болуы мүмкін."}}
+  if(m<=4){const f=R(1,10*l+10);return R(0,1)?{q:`(${a} + ${b}) × ${c} − ${f}`,a:(a+b)*c-f,h:"Алдымен жақша ішін есепте."}:{q:`(${d*q} + ${d*c}) ÷ ${d} = ?`,a:q+c,h:"Жақша ішіндегі қосындыны ортақ көбейткішке қысқарт."}}
+  if(m<=7)return R(0,1)?{q:`${a} × ${b} − ${c} × ${x}`,a:a*b-c*x,h:"Екі көбейтіндіні бөлек тауып, азайт."}:{q:`${d*q*e} ÷ ${d} ÷ ${e} = ?`,a:q,h:"Амалдарды солдан оңға қарай ретімен орында."};
+  if(m<=10){const f=R(1,a+c*x+10);return{q:`${a*b} ÷ ${b} + ${c} × ${x} − ${f}`,a:a+c*x-f,h:"× және ÷ амалдарын алдымен орында."}}
+  const y=R(2,9),f=R(1,(a+c)*x);
+  return{q:`(${a*b} ÷ ${b} + ${c}) × ${x} − ${y} × ${f}`,a:(a+c)*x-y*f,h:"Жақша ішін, сосын көбейтуді орында."}},
 teng(l){const m=Math.ceil(l*2/3),w=8+l,x=R(-w,w),a=R(2,9),b=R(1,10+l);
   if(m<=1)return{q:`x + ${b} = ${sn(x+b)}.  x = ?`,a:x,h:"Қосылғышты екінші жаққа азайтып аудар."};
-  if(m==2)return{q:`${a}x + ${b} = ${sn(a*x+b)}.  x = ?`,a:x,h:`Алдымен ${b}-ны азайт, сосын ${a}-ға бөл.`};
-  if(m<=4)return{q:`${a}(x + ${b}) = ${sn(a*(x+b))}.  x = ?`,a:x,h:`Екі жағын ${a}-ға бөл, сосын ${b}-ны азайт.`};
+  if(m<=4)return R(0,1)?{q:`${a}x + ${b} = ${sn(a*x+b)}.  x = ?`,a:x,h:`Алдымен ${b}-ны азайт, сосын ${a}-ға бөл.`}:{q:`${a}(x + ${b}) = ${sn(a*(x+b))}.  x = ?`,a:x,h:`Екі жағын ${a}-ға бөл, сосын ${b}-ны азайт.`};
   if(m<=6){const c=R(2,6),A=c+R(1,5);return{q:`${A}x + ${b} = ${c}x ${sg(b+(A-c)*x)}.  x = ?`,a:x,h:"x-ті бір жаққа, сандарды екінші жаққа жина."}}
   if(m<=8){const c=R(1,20),X=b+R(-10,10);return{q:`${a}(x − ${b}) + ${c} = ${sn(a*(X-b)+c)}.  x = ?`,a:X,h:`Алдымен ${c}-ны азайт, сосын ${a}-ға бөл, соңында ${b}-ны қос.`}}
-  const r1=R(-(5+l),5+l),r2=r1+R(1,6);
-  return{q:`x² ${sg(-(r1+r2))}x ${sg(r1*r2)} = 0.  Кіші түбірі x = ?`,a:r1,h:"Виет теоремасы: түбірлердің қосындысы мен көбейтіндісін қара."}},
+  const k=R(2,6),X=k*R(-9,9);
+  return{q:`x / ${k} + ${b} = ${sn(X/k+b)}.  x = ?`,a:X,h:`Алдымен ${b}-ны азайт, содан кейін ${k}-ға көбейт.`}},
 payiz(l){const m=Math.ceil(l*2/3),k=R(1,10+l),n=20*k,j=R(1,8);
-  if(m<=1){const p=pick([10,50,25]);return{q:`${n}-тің ${p}% = ?`,a:n*p/100,h:"a · p / 100"}}
-  if(m==2){const p=pick([5,15,20,30,40]);return{q:`${n}-тің ${p}% = ?`,a:n*p/100,h:"a · p / 100"}}
+  if(m<=2){const p=pick([5,10,15,20,25,30,40,50]);return{q:`${n}-тің ${p}% = ?`,a:n*p/100,h:"a · p / 100"}}
   if(m<=4){const p=5*j;return R(0,1)?{q:`Бағасы ${n} теңге тауарға ${p}% жеңілдік. Жаңа баға (теңге)?`,a:n*(100-p)/100,h:"Бағаны (100 − p)% деп есепте."}:{q:`Тауарды ${n} теңгеге сатып алып, ${p}% арзанға сатты. Пайда қанша теңге? (шығын болса, теріс сан)`,a:-(n*p/100),h:"Шығын: сатып алу бағасының p%-ы, ол теріс таңбамен жазылады."}}
   if(m<=6){const p=5*j;return{q:`Бағасы ${n} теңге тауар ${p}% қымбаттады. Жаңа баға (теңге)?`,a:n*(100+p)/100,h:"Бағаны (100 + p)% деп есепте."}}
   if(m<=8){const n2=100*R(1,5+l),p1=10*R(1,5),p2=10*R(1,5);return{q:`Бағасы ${n2} теңге тауар алдымен ${p1}% арзандады, сосын жаңа бағадан ${p2}% қымбаттады. Соңғы баға (теңге)?`,a:n2/100*(100-p1)*(100+p2)/100,h:"Әр қадамды бөлек есепте: жаңа бағадан келесі пайыз алынады."}}
@@ -486,36 +490,67 @@ geo(l){const m=Math.ceil(l*2/3),a=R(3,10+l),b=R(2,8+l);
   if(m<=8){const h=R(2,9);return pick([{q:`Радиусы ${b} шеңбердің ұзындығы? (p = 3,14; жауабы 0,01 дәлдікпен)`,a:+(2*3.14*b).toFixed(2),h:"C = 2pr"},{q:`Радиусы ${b}, биіктігі ${h} цилиндрдің көлемі? (p = 3,14)`,a:+(3.14*b*b*h).toFixed(2),h:"V = pr²h"}])}
   if(m<=10){const r=3*R(1,3);return{q:`Радиусы ${r} шардың көлемі? (p = 3,14; жауабы 0,01 дәлдікпен)`,a:+(4*3.14*r**3/3).toFixed(2),h:"V = 4/3 · pr³"}}
   const r=3*R(1,4),h=R(2,9);return{q:`Радиусы ${r}, биіктігі ${h} конустың көлемі? (p = 3,14; жауабы 0,01 дәлдікпен)`,a:+(3.14*r*r*h/3).toFixed(2),h:"V = ⅓ · pr²h"}},
+/* ЖАҢА: Квадраттық теңдеулер */
+kvad(l,noR){const m=Math.ceil(l*2/3),r1=R(1,5+l),r2=r1+R(1,6),n=R(-(5+l),-2),n2=Math.min(n+R(1,6),-1),a=R(2,5);
+  const vi=()=>R(0,1)?{q:`x² ${sg(-(r1+r2))}x ${sg(r1*r2)} = 0.  Үлкен түбірі x = ?`,a:r2,h:"Виет теоремасы: x₁ + x₂ = −b, x₁ · x₂ = c."}:{q:`x² ${sg(-(n+n2))}x ${sg(n*n2)} = 0.  Кіші түбірі x = ?`,a:n,h:"Виет теоремасы: қосындысы −b, көбейтіндісі c."};
+  const sol=pos=>{let p,q;do{p=pos?R(1,4+l):R(-(4+l),4+l);q=pos?R(1,4+l):R(-(4+l),4+l)}while(p==q||!p||!q);const lo=Math.min(p,q),hi=Math.max(p,q),B=-(p+q),C=p*q;return{q:`x²${B?" "+sg(B)+"x":""} ${sg(C)} = 0 теңдеуін шешіңіз. Екі түбірін де жазыңыз (мысалы: 2 3).`,a:lo,r:[lo,hi],h:`Виет теоремасы: x₁ + x₂ = ${sn(-B)}, x₁ · x₂ = ${sn(C)}, демек түбірлері ${sn(lo)} және ${sn(hi)}.`}};
+  const ps=pos=>noR?vi():sol(pos);
+  if(m<=2){const k=R(2,9+l);return R(0,1)?{q:`x² = ${k*k}.  Оң түбірі x = ?`,a:k,h:"x² = k² болса, оң түбірі k."}:ps(true)}
+  if(m<=4)return ps(true);
+  if(m<=6)return R(0,1)?vi():ps(false);
+  if(m<=8)return R(0,1)?ps(false):{q:`${a}x² ${sg(-a*(n+r2))}x ${sg(a*n*r2)} = 0.  Үлкен түбірі x = ?`,a:r2,h:"D = b² − 4ac; x = (−b ± √D) / 2a"};
+  if(m<=10){const b=R(-9,9)||3,c=R(-9,9)||2;return{q:`x² ${sg(b)}x ${sg(c)} = 0 теңдеуінің дискриминанты D = ?`,a:b*b-4*c,h:"D = b² − 4ac"}}
+  return pick([{q:`x² ${sg(-(r1+r2))}x ${sg(r1*r2)} = 0 теңдеуі түбірлерінің квадраттарының қосындысы?`,a:r1*r1+r2*r2,h:"x₁² + x₂² = (x₁ + x₂)² − 2x₁x₂"},{q:`x² ${sg(-(r1+r2))}x ${sg(r1*r2)} = 0 теңдеуінің бір түбірі ${r1}. Екінші түбірі?`,a:r2,h:"x₁ + x₂ = −b"}])},
+/* ЖАҢА: Қысқаша көбейту формулалары */
+kmf(l){const m=Math.ceil(l*2/3),t=R(1,9),u=R(1,3),a=R(2,9+l),b=R(2,9+l);
+  if(m<=4){const pl=R(0,1),n=pl?10*t+u:10*(t+1)-u;return{q:`${n}² = ?`,a:n*n,h:pl?`(${10*t} + ${u})² = ${100*t*t} + ${20*t*u} + ${u*u}`:`(${10*(t+1)} − ${u})² = a² − 2ab + b²`}}
+  if(m<=6){const n=10*(t+1);return{q:`${n+u} × ${n-u} = ?`,a:n*n-u*u,h:`(a + b)(a − b) = a² − b²;  a = ${n}, b = ${u}`}}
+  if(m<=8){const s=R(4,12),p=R(1,Math.floor(s*s/4));return{q:`a + b = ${s}, ab = ${p}.  a² + b² = ?`,a:s*s-2*p,h:"a² + b² = (a + b)² − 2ab"}}
+  if(m<=10)return{q:`(${a} + ${b})² − (${a} − ${b})² = ?`,a:4*a*b,h:"Айырма 4ab-ға тең."};
+  const k=R(3,9+l);return pick([{q:`x + 1/x = ${k}.  x² + 1/x² = ?`,a:k*k-2,h:"(x + 1/x)² = x² + 2 + 1/x²"},{q:`a − b = ${a}, ab = ${b}.  a² + b² = ?`,a:a*a+2*b,h:"a² + b² = (a − b)² + 2ab"}])},
+/* ЖАҢА: Өрнектерді түрлендіру */
+ort(l){const m=Math.ceil(l*2/3),a=R(2,9),b=R(1,9),c=R(2,9),d=R(1,9),p=R(2,6);let X=R(-9,9);
+  if(m<=2)return{q:`${a}(x + ${b}) − ${c}(x − ${d}).  x = ${sn(X)} болғанда мәні?`,a:a*(X+b)-c*(X-d),h:"Алдымен жақшаны аш, ұқсас мүшелерді қыс."};
+  if(m<=4)return R(0,1)?{q:`${a}(x + ${b}) − ${c}(x − ${d}) өрнегін қысқартқанда x-тің коэффициенті?`,a:a-c,h:"Жақшаны ашып, x-ті бар мүшелерді қос."}:{q:`${a}(x + ${b}) − ${c}(x − ${d}) өрнегін қысқартқанда бос мүшесі?`,a:a*b+c*d,h:"Жақшаны ашып, сандарды қос."};
+  if(m<=6)return{q:`(x + ${a})(x + ${b}) − x(x + ${c}).  x = ${sn(X)} болғанда мәні?`,a:(X+a)*(X+b)-X*(X+c),h:"Екі жақшаны көбейтіп, x² қысқарады."};
+  if(m<=8){if(X==a)X=a+1;return{q:`(x² − ${a*a}) / (x − ${a}) өрнегінің x = ${sn(X)} болғандағы мәні?`,a:X+a,h:"x² − a² = (x − a)(x + a), (x − a) қысқарады."}}
+  return pick([{q:`(${p}x + ${a})² − (${p}x − ${a})².  x = ${sn(X)} болғанда мәні?`,a:4*p*a*X,h:"Айырма 4pax-қа тең."},{q:`(x − ${a})(x² + ${a}x + ${a*a}).  x = ${sn(X)} болғанда мәні?`,a:X**3-a**3,h:"(x − a)(x² + ax + a²) = x³ − a³"}])},
 dar(l){const m=Math.ceil(l*2/3),a=R(2,10+l);
-  if(m<=1)return R(0,1)?{q:`${a}² = ?`,a:a*a,h:"a² = a · a"}:{q:`−${a}² = ?`,a:-a*a,h:"Алдымен дәрежеге шығар, сосын минус қой."};
-  if(m==2)return R(0,1)?{q:`√${a*a} = ?`,a:a,h:"Квадраты осы санға тең оң санды тап."}:{q:`−√${a*a} = ?`,a:-a,h:"Түбірді тауып, алдына минус қой."};
+  if(m<=2)return pick([{q:`${a}² = ?`,a:a*a,h:"a² = a · a"},{q:`−${a}² = ?`,a:-a*a,h:"Алдымен дәрежеге шығар, сосын минус қой."},{q:`√${a*a} = ?`,a:a,h:"Квадраты осы санға тең оң санды тап."},{q:`−√${a*a} = ?`,a:-a,h:"Түбірді тауып, алдына минус қой."}]);
   if(m<=4){const k=R(1,m-1),[x,y,z]=pick([[3,4,5],[5,12,13],[8,15,17],[6,8,10]]);return{q:`Катеттері ${x*k} және ${y*k} тікбұрышты үшбұрыштың гипотенузасы?`,a:z*k,h:"c² = a² + b²"}}
   if(m<=6){const n=R(2,9),e=R(5,10);return pick([{q:`${n}³ = ?`,a:n**3,h:"n³ = n · n · n"},{q:`(−${n})³ = ?`,a:-(n**3),h:"Теріс санның тақ дәрежесі теріс болады."},{q:`2^${e} = ?`,a:2**e,h:"2-ні e рет өзіне көбейт."}])}
-  if(m<=8){const A=R(6,9+l),B=R(2,A+6);return{q:`${A}² − ${B}² = ?`,a:A*A-B*B,h:"a² − b² = (a − b)(a + b)"}}
+  if(m<=8){const A=R(2,9),B=R(2,9);return{q:`√${A*A} · √${B*B} = ?`,a:A*B,h:"√a · √b = √(ab)"}}
   if(m<=10){const p=R(2,6),r=R(2,6),e=R(3,9);return pick([{q:`2^${p} × 2^${r} = ?`,a:2**(p+r),h:"Дәреже көрсеткіштерін қос: aᵐ · aⁿ = aᵐ⁺ⁿ"},{q:`(−2)^${e} = ?`,a:(-2)**e,h:"Көрсеткіш тақ болса, жауап теріс."}])}
   const n=R(2,12);return{q:`³√(−${n**3}) + √${a*a} = ?`,a:a-n,h:"Куб және квадрат түбірді бөлек тап."}}
 };
+const RECENT=[];
+function gen(t,l,noR){let g,i=0;do{g=GEN[t](l,noR)}while(RECENT.includes(g.q)&&++i<25);RECENT.push(g.q);if(RECENT.length>20)RECENT.shift();return g}
 function fillTopics(){$("#topic").innerHTML='<option value="smart">Ақылды таңдау</option><option value="mix">Аралас</option>'+Object.keys(TOPICS).map(t=>`<option value="${t}">${TOPICS[t]}</option>`).join("")}
 fillTopics();
 let cur=null,answered=false,Q0=Date.now(),qActive=null,retryId=null;
 function newQ(forcedTopic=null){
   const sel=$("#topic").value,state=qState(),t=forcedTopic|| (sel=="smart"?qChoose(state,true):sel=="mix"?pick(Object.keys(TOPICS)):sel),l=level(t);qActive={state,action:t};retryId=null;
-  cur={t,l,...GEN[t](l)};answered=false;Q0=Date.now();
+  cur={t,l,...gen(t,l)};answered=false;Q0=Date.now();
   $("#q").textContent=cur.q;$("#qm").textContent=`${TOPICS[t]}, ${l}-деңгей · Келесі деңгейге: ${S.sv>=720?0:40-S.sv%40} есеп`;
   $("#fb").textContent="";$("#fb").className="";$("#ans").value="";$("#chk").textContent="Тексеру";$("#ans").focus();
 }
 function check(){
   if(answered)return newQ();
-  const fb=$("#fb"),raw=$("#ans").value.trim().replace(/[−–—]/g,"-").replace(",",".");
-  if(!/^[+-]?(?:\d+(?:\.\d*)?|\.\d+)$/.test(raw)){fb.textContent="Тек сан енгізіңіз, мысалы 12, −5 немесе 3,5.";fb.className="bad";return}const v=Number(raw);
-  const ok=Math.abs(v-cur.a)<0.011;answered=true;const before=P(cur.t),after=bkt(cur.t,ok);if(qActive)qLearn(qActive.action,qActive.state,before,after,ok);rec(cur.t,ok,(Date.now()-Q0)/1000);
+  const fb=$("#fb"),raw0=$("#ans").value.trim().replace(/[−–—]/g,"-");let ok;
+  if(cur.r){const nums=(raw0.match(/-?\d+(?:\.\d+)?/g)||[]).map(Number).sort((x,y)=>x-y);
+    if(!nums.length){fb.textContent="Екі түбірді де сандармен жазыңыз, мысалы 2 3 немесе −1; 4.";fb.className="bad";return}
+    ok=nums.length==cur.r.length&&nums.every((x,i)=>Math.abs(x-cur.r[i])<0.011)}
+  else{const raw=raw0.replace(",",".");
+    if(!/^[+-]?(?:\d+(?:\.\d*)?|\.\d+)$/.test(raw)){fb.textContent="Тек сан енгізіңіз, мысалы 12, −5 немесе 3,5.";fb.className="bad";return}
+    ok=Math.abs(Number(raw)-cur.a)<0.011}
+  answered=true;const before=P(cur.t),after=bkt(cur.t,ok);if(qActive)qLearn(qActive.action,qActive.state,before,after,ok);rec(cur.t,ok,(Date.now()-Q0)/1000);
   if(ok){if(retryId){S.errors=(S.errors||[]).filter(e=>e.id!==retryId);retryId=null}const xp=Math.min(10+2*cur.l,30),lu=solved();S.streak++;fb.textContent=`Дұрыс! +${xp} XP. Формула: ${cur.h}`;fb.className="ok";addXP(xp);cheer(lu)}
-  else{S.streak=0;if(!retryId){S.errors=S.errors||[];S.errors.push({id:Date.now()+"-"+Math.random().toString(36).slice(2),t:cur.t,q:cur.q,a:cur.a,h:cur.h});S.errors=S.errors.slice(-30)}fb.textContent=`Дұрыс жауап: ${sn(cur.a)}. Кеңес: ${cur.h}`;fb.className="bad";ui()}
+  else{S.streak=0;if(!retryId){S.errors=S.errors||[];S.errors.push({id:Date.now()+"-"+Math.random().toString(36).slice(2),t:cur.t,q:cur.q,a:cur.a,r:cur.r,h:cur.h});S.errors=S.errors.slice(-30)}fb.textContent=`Дұрыс жауап: ${cur.r?cur.r.map(sn).join(" және "):sn(cur.a)}. Кеңес: ${cur.h}`;fb.className="bad";ui()}
   save();$("#chk").textContent="Келесі есеп";
 }
 
-/* ===== Жылдам жауап: арифметика және теңдеулер, 4 нұсқа, әр есепке 31 секунд ===== */
-const QT=["arif","bolu","teng"],QSEC=31;
+/* ===== Жылдам жауап: арифметика, теңдеулер, квадраттық теңдеулер; 4 нұсқа, әр есепке 31 секунд ===== */
+const QT=["arif","teng","kvad"],QSEC=31;
 let qk=null,qkAns=true,qkT0=0,qkLast=0,qkTim=null;
 function mkOpts(a){const o=[a];for(const v of shuf([a+1,a-1,a+2,a-2,a+3,a-3,a+4,a-4,a+5,a-5,a+10,a-10,-a,a*2]))if(o.length<4&&!o.includes(v))o.push(v);return shuf(o)}
 $("#qkT").innerHTML='<option value="mix">Аралас</option>'+QT.map(t=>`<option value="${t}">${TOPICS[t]}</option>`).join("");
@@ -524,7 +559,7 @@ function closeQK(){clearInterval(qkTim);qkAns=true;$("#qkv").hidden=true;$("#qks
 function newQK(){
   clearInterval(qkTim);
   const sel=$("#qkT").value,t=QT.includes(sel)?sel:pick(QT),l=level(t),state=qState();
-  qk={t,l,state,...GEN[t](l)};qkAns=false;qkT0=qkLast=Date.now();
+  qk={t,l,state,...gen(t,l,true)};qkAns=false;qkT0=qkLast=Date.now();
   $("#qkQ").textContent=qk.q;$("#qkM").textContent=`${TOPICS[t]}, ${l}-деңгей`;
   $("#qkF").textContent="";$("#qkF").className="";$("#qkN").hidden=true;
   $("#qkO").innerHTML=mkOpts(qk.a).map(v=>`<button data-v="${v}" onclick="endQK(${v})">${sn(v)}</button>`).join("");
@@ -681,8 +716,9 @@ function runTests(){
     ["AI 9 тастан 1 тас алады (қалғаны 8)",()=>aiMove(9,20).k===1],
     ["Minimax пен AI: 1–19 тас үшін оңтайлы нәтиже",()=>{for(let n=1;n<=19;n++){const e=n%4?1:-1;if(ab(n,true,20,-2,2,{n:0})!==e||aiMove(n,20).v!==e)return false}return true}],
     ["AI тақырыпты жауапқа қарай таңдайды",()=>{const q0=S.q,n0=S.qn||0;let ok=false;try{S.q={};S.qn=0;const t=Object.keys(TOPICS)[0],st=qState(),b=P(t),base=1-b;qLearn(t,st,b,Math.min(.99,b+.3),true);ok=S.qn===1&&S.q[st][t]>base}finally{S.q=q0;S.qn=n0;save()}return ok}],
-    ["Есеп генераторы: әр тақырып пен 1–18 деңгейде жарамды есеп бар",()=>{for(const t of Object.keys(TOPICS))for(let l=1;l<=18;l++){const g=GEN[t](l);if(!Number.isFinite(g.a)||!g.q||!g.h)return false}return true}],
+    ["Есеп генераторы: әр тақырып пен 1–18 деңгейде жарамды есеп бар",()=>{for(const t of Object.keys(TOPICS))for(let l=1;l<=18;l++)for(let i=0;i<30;i++){const g=GEN[t](l);if(!Number.isFinite(g.a)||!g.q||!g.h||/undefined|NaN/.test(g.q))return false}return true}],
     ["Теріс жауаптар кездеседі",()=>{let n=0;for(let i=0;i<400;i++)if(GEN[pick(["arif","teng","dar"])](R(1,18)).a<0)n++;return n>20}],
+    ["Жаңа тақырыптар: квадраттық теңдеулер, ҚКФ, өрнектерді түрлендіру бар",()=>["kvad","kmf","ort"].every(t=>TOPICS[t]&&GEN[t])&&!TOPICS.bolu],
     ["18 деңгей: әр деңгей 40 есеп, барлығы 720",()=>{const s0=S.sv,r=[0,39,40,679,720].map(v=>{S.sv=v;return ulv()});S.sv=s0;return r.join()=="1,1,2,17,18"}],
     ["Жылдам жауап: 4 нұсқа, біреуі дұрыс",()=>{for(let i=0;i<200;i++){const a=R(-60,60),o=mkOpts(a);if(o.length!=4||new Set(o).size!=4||!o.includes(a))return false}return true}],
     ["Сан енгізу: бүтін, ондық және теріс мән; артық мәтін қабылданбайды",()=>{const n=s=>/^[+-]?(?:\d+(?:\.\d*)?|\.\d+)$/.test(s);return n("12")&&n("-5")&&n("3.5")&&!n("12abc")&&!n("abc")} ]
@@ -709,7 +745,7 @@ async function authGo(){
   else if(!U[l]||(U[l].h!==h&&!alt.includes(U[l].h))){fails++;LS.set("dabo_fail",fails);e.textContent="Логин немесе пароль қате.";$("#aF").hidden=fails<6;return}
   login(l);
 }
-function login(l){fails=0;LS.set("dabo_fail",0);CUR=l;LS.set("dabo_cur",l);const d0=U[l].d||{};if(!("sv" in d0))d0.sv=Math.min(680,Math.floor((d0.xp||0)/100)*40);S=Object.assign(DEF(),d0);save();touchDay();$("#auth").hidden=true;$("#aP").value="";applyBg();show("home")}
+function login(l){fails=0;LS.set("dabo_fail",0);CUR=l;LS.set("dabo_cur",l);const d0=U[l].d||{};if(!("sv" in d0))d0.sv=Math.min(680,Math.floor((d0.xp||0)/100)*40);S=Object.assign(DEF(),d0);S.errors=(S.errors||[]).filter(e=>TOPICS[e.t]);save();touchDay();$("#auth").hidden=true;$("#aP").value="";applyBg();show("home")}
 function logout(){save();CUR="";LS.set("dabo_cur","");S=DEF();$("#auth").hidden=false;authMode("in");show("home")}
 const BG=["","linear-gradient(135deg,#a1c4fd,#c2e9fb)","linear-gradient(135deg,#a8e6cf,#dcedc1)","linear-gradient(135deg,#ffb88c,#ffd6a5)","linear-gradient(135deg,#667eea,#764ba2)","linear-gradient(135deg,#f093fb,#f5576c)"];
 const bgE=(g,a,b)=>{const v=`<svg xmlns="http://www.w3.org/2000/svg" width="72" height="72"><text x="6" y="30" font-size="26" opacity=".6">${a}</text><text x="38" y="62" font-size="26" opacity=".6">${b}</text></svg>`;return `url("data:image/svg+xml,${encodeURIComponent(v)}") 0 0/72px 72px,${g}`};
