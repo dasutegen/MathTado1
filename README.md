@@ -1,1 +1,2 @@
-л# MathTado1 ф
+ MathTado1 
+![Ойынның басты мәзірі](docs/screenshots/menu.png)
