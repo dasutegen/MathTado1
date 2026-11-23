@@ -1,2 +1,2 @@
  MathTado1 
-![Ойынның басты мәзірі](docs/screenshots/menu.png)
+![Ойынның басты мәзірі](file:///C:/Users/user/Pictures/result2.png)
